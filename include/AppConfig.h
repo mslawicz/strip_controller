@@ -25,7 +25,7 @@
 
 #define APP_TASK_NAME "Lit"
 
-#define BLE_DEV_NAME "SiLabs-Light"
+#define BLE_DEV_NAME "strip-controller"
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
