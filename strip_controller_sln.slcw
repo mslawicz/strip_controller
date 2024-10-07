@@ -1,0 +1,15 @@
+---
+label: "strip_controller_sln"
+quality: "production"
+description: "Matter workspace container both a Matter bootloader and Lighting over\
+  \ Thread Example"
+project:
+- id: "application"
+  path: "strip_controller.slcp"
+  output: "."
+- id: "bootloader"
+  path: "..\\strip_controller_btl\\strip_controller_btl.slcp"
+  output: "../strip_controller_btl"
+post_build:
+  profile: ""
+  path: "strip_controller_sln.slpb"
