@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "strip_controller",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": ""
+        }
+    ],
+    "version": 4
+}
