@@ -39,6 +39,9 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include "sl_pwm.h" //XXX test
+#include "sl_pwm_instances.h"   //XXX test
+
 #ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define LIGHT_LED 1
 #else
@@ -130,6 +133,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
+
+    //XXX test of PWM
+    sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 66);
+    sl_pwm_start(&sl_pwm_WS2812_bit);
+
 
     while (true)
     {
