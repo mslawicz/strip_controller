@@ -46,6 +46,7 @@ sl_rail_util_pti_config.h=-810486626
 sl_rail_util_rssi_config.h=-2076214269
 sl_rail_util_sequencer_config.h=2009587319
 sl_simple_led_led0_config.h=-917927416
+sl_simple_led_led1_config.h=576725429
 sl_sleeptimer_config.h=1360009810
 sl_uartdrv_eusart_vcom_config.h=-1762591658
 sli_psa_builtin_config.h=286007242
