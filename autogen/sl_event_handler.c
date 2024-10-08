@@ -23,6 +23,7 @@
 #include "sl_mbedtls.h"
 #include "nvm3_default.h"
 #include "sl_ot_rtos_adaptation.h"
+#include "sl_pwm_instances.h"
 #include "sl_simple_led_instances.h"
 #include "sl_uartdrv_instances.h"
 #include "psa/crypto.h"
@@ -57,6 +58,7 @@ void sl_kernel_start(void)
 void sl_driver_init(void)
 {
   GPIOINT_Init();
+  sl_pwm_init_instances();
   sl_simple_led_init_instances();
   sl_uartdrv_init_instances();
 }

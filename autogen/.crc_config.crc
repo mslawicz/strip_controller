@@ -40,6 +40,7 @@ sl_openthread_features_config.h=861348996
 sl_openthread_generic_config.h=402741980
 sl_openthread_rtos_config.h=-1766429253
 sl_power_manager_config.h=1785114758
+sl_pwm_init_WS2812_bit_config.h=1957651784
 sl_rail_util_pa_config.h=309123906
 sl_rail_util_power_manager_init_config.h=950125848
 sl_rail_util_pti_config.h=-810486626

@@ -77,6 +77,14 @@
 // [TIMER1]$
 
 // $[TIMER2]
+// TIMER2 CC0 on PA04
+#ifndef TIMER2_CC0_PORT                         
+#define TIMER2_CC0_PORT                          gpioPortA
+#endif
+#ifndef TIMER2_CC0_PIN                          
+#define TIMER2_CC0_PIN                           4
+#endif
+
 // [TIMER2]$
 
 // $[TIMER3]
