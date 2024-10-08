@@ -51,7 +51,7 @@
 #define SL_SIMPLE_LED_LED0_PORT                  gpioPortA
 #endif
 #ifndef SL_SIMPLE_LED_LED0_PIN                  
-#define SL_SIMPLE_LED_LED0_PIN                   0
+#define SL_SIMPLE_LED_LED0_PIN                   8
 #endif
 // [GPIO_SL_SIMPLE_LED_LED0]$
 
