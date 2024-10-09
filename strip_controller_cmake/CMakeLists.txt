@@ -14,6 +14,7 @@ include(strip_controller.cmake)
 
 add_executable(strip_controller
     # Add additional sources here
+    ../src/StripController.cpp
 )
 
 target_include_directories(strip_controller PUBLIC

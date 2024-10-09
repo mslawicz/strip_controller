@@ -39,8 +39,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include "sl_pwm.h" //XXX test
-#include "sl_pwm_instances.h"   //XXX test
+#include "StripController.h"
 
 #ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define LIGHT_LED 1
@@ -134,10 +133,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SILABS_LOG("App Task started");
 
-    //XXX test of PWM
-    sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 66);
-    sl_pwm_start(&sl_pwm_WS2812_bit);
-
+    //create strip controller task
+    stripControllerInit();
 
     while (true)
     {
