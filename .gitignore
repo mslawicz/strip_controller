@@ -2,3 +2,4 @@ build
 artifact
 /.vscode/settings.json
 /strip_controller_cmake/strip_controller.cmake
+/.projectlinkstore
