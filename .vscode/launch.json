@@ -7,7 +7,7 @@
             "request": "launch",
             "serverpath": "C:/SiliconLabs/SimplicityStudio/v5/developer/adapter_packs/exx32/JLinkGDBServerCL.exe",
             "servertype": "jlink",
-            "armToolchainPath": "C:\\SiliconLabs\\SimplicityStudio\\v5\\developer\\toolchains\\gnu_arm\\12.2.rel1_2023.7\\bin\\",
+            "gdbPath": "C:\\SiliconLabs\\SimplicityStudio\\v5\\developer\\adapter_packs\\exx32\\arm-none-eabi-gdb.exe",
             "device": "Cortex-M33",
             "svdFile": "C:\\SiliconLabs\\SimplicityStudio\\v5\\offline\\svd\\mgm240pb32vna.svd",
             "runToEntryPoint": "main",
