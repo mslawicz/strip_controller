@@ -67,6 +67,8 @@ component:
 - {id: brd2704a}
 - {id: clock_manager}
 - {id: device_init}
+- instance: [test0]
+  id: emlib_gpio_simple_init
 - {id: ot_rtos_wrappers_real}
 - {id: ot_stack_ftd}
 - instance: [WS2812_bit]

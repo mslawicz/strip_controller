@@ -181,6 +181,13 @@
 #define _PIN                                     0
 #endif
 
+#ifndef test0_PORT                              
+#define test0_PORT                               gpioPortB
+#endif
+#ifndef test0_PIN                               
+#define test0_PIN                                0
+#endif
+
 // [CUSTOM_PIN_NAME]$
 
 #endif // PIN_CONFIG_H

@@ -23,6 +23,7 @@ sl_clock_manager_oscillator_config.h=-674254434
 sl_clock_manager_tree_config.h=-2054824487
 sl_core_config.h=-119586893
 sl_device_init_dcdc_config.h=419091409
+sl_emlib_gpio_init_test0_config.h=1737403388
 sl_fem_util_config.h=408768311
 sl_gp_interface_config.h=-1994694665
 sl_hfxo_manager_config.h=1606678224

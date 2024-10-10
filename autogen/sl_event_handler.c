@@ -18,6 +18,7 @@
 #include "platform-efr32.h"
 #include "sl_sleeptimer.h"
 #include "sl_mpu.h"
+#include "sl_emlib_gpio_simple_init.h"
 #include "gpiointerrupt.h"
 #include "sl_iostream_rtt.h"
 #include "sl_mbedtls.h"
@@ -57,6 +58,7 @@ void sl_kernel_start(void)
 
 void sl_driver_init(void)
 {
+  sl_emlib_gpio_simple_init();
   GPIOINT_Init();
   sl_pwm_init_instances();
   sl_simple_led_init_instances();
