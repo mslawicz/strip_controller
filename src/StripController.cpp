@@ -37,6 +37,14 @@ void StripController::start(void)
     sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 50);
     sl_pwm_start(&sl_pwm_WS2812_bit);
 
-    //std::bind(&StripController::handler, this, nullptr);
-    //sStripControllerTaskHandle = osThreadNew((osThreadFunc_t*)std::bind(&StripController::handler, &StripController::getInstance()), nullptr, &stripControllerTaskAttr);
+    auto StripControllerHandler = std::bind(&StripController::handler, this, nullptr);
+    sStripControllerTaskHandle = osThreadNew(reinterpret_cast<osThreadFunc_t>(&StripControllerHandler), nullptr, &stripControllerTaskAttr);
+}
+
+void StripController::handler(void *pvParameter)
+{
+    while(1)
+    {
+        osDelay(1000);
+    }
 }
