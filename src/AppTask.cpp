@@ -133,8 +133,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SILABS_LOG("App Task started");
 
-    //create strip controller task
-    stripControllerInit();
+    //start strip controller task
+    StripController::getInstance().start();
 
     while (true)
     {

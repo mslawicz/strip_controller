@@ -1,14 +1,12 @@
 #pragma once
 
-void stripControllerInit(void);
-
 class StripController
 {
     public:
-    StripController() = default;
-    static StripController& getInstance(void) { return stripController; }
-    void handler(void * pvParameter);
+    static StripController& getInstance(void);
+    void start(void);
+    void handler(void * pvParameter) {}
 
     private:
-    static StripController stripController;
+    StripController() = default;
 };

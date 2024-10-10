@@ -20,18 +20,23 @@ constexpr osThreadAttr_t stripControllerTaskAttr = { .name = "StripControllerTas
 
 osThreadId_t sStripControllerTaskHandle;
 
-//initialize strip controller task
-void stripControllerInit(void)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-local-addr"
+
+StripController& StripController::getInstance(void)
+{ 
+    StripController instance;
+    return instance;
+}
+
+#pragma GCC diagnostic pop
+
+void StripController::start(void)
 {
     //XXX test of PWM
     sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 50);
     sl_pwm_start(&sl_pwm_WS2812_bit);
 
-    std::bind(&StripController::handler, &StripController::getInstance);
-    sStripControllerTaskHandle = osThreadNew((osThreadFunc_t*)std::bind(&StripController::handler, &StripController::getInstance()), nullptr, &stripControllerTaskAttr);
-}
-
-void StripController::handler(void *pvParameter)
-{
-
+    //std::bind(&StripController::handler, this, nullptr);
+    //sStripControllerTaskHandle = osThreadNew((osThreadFunc_t*)std::bind(&StripController::handler, &StripController::getInstance()), nullptr, &stripControllerTaskAttr);
 }
