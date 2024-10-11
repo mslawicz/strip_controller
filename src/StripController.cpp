@@ -1,11 +1,11 @@
 #include "StripController.h"
 #include "silabs_utils.h"
-#include "em_ldma.h"
 #include "em_gpio.h"    //XXX test
 #include "pin_config.h" //XXX test
-#include "em_timer.h"
+#include "sl_spidrv_instances.h"
 
 #define SC_TASK_STACK_SIZE (1024)
+#define WS2812_BUFFER_SIZE  4
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -20,7 +20,10 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
     .priority   = osPriorityBelowNormal
 };
 
+uint8_t WS2812_buffer[WS2812_BUFFER_SIZE];
+
 void stripControllerHandler(void * pvParameter);
+void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-local-addr"
@@ -48,5 +51,20 @@ void stripControllerHandler(void* pvParameter)
     {
         osDelay(10);
         GPIO_PinOutToggle(test0_PORT, test0_PIN);
+
+        //XXX SPI test
+        WS2812_buffer[0] = 0x9B;
+        WS2812_buffer[1] = 0x49;
+        WS2812_buffer[2] = 0xB4;
+        WS2812_buffer[3] = 0x00;
+        SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
     }
+}
+
+void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred)
+{
+  if (transferStatus == ECODE_EMDRV_SPIDRV_OK)
+  {
+   // Success !
+  }
 }
