@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ASCII"?>
 <model:MDescriptors xmlns:model="http://www.silabs.com/ss/Studio.ecore">
   <descriptors name="strip_controller">
-    <properties key="projectCommon.sdkId" value="com.silabs.sdk.stack.sisdk:2024.6.2._81475633"/>
+    <properties key="projectCommon.sdkId" value="com.silabs.sdk.stack.sisdk:2024.6.2._-1268457713"/>
     <properties key="universalConfig.relativeWorkspacePath" value="..\strip_controller_sln.slcw"/>
     <properties key="universalConfig.generationDirectory" value=""/>
     <properties key="universalConfig.toolchainCompatibility" value="gcc"/>

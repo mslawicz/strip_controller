@@ -114,6 +114,6 @@ ui_hints:
   highlight:
   - {path: README.md}
 sdk_extension:
-- {id: matter, version: 2.3.1}
+- {id: matter, version: 2.3.2}
 post_build: {path: strip_controller.slpb, profile: application}
 
