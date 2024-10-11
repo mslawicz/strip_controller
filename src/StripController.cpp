@@ -8,7 +8,7 @@
 #include "em_timer.h"
 
 #define SC_TASK_STACK_SIZE (1024)
-#define WS2812_BIT_SIZE 5
+#define WS2812_BIT_SIZE 9
 /*(8 * 24 + 1)*/
 
 /**
@@ -44,10 +44,10 @@
     }                                                     \
   }
 
-static uint16_t WS2812_bits[WS2812_BIT_SIZE];   //PWM values of WS2812 bits
+static uint16_t WS2812_bits[WS2812_BIT_SIZE];   //PWM timer OC values of WS2812 bits
 // Configure DMA transfer
 const LDMA_TransferCfg_t ldmaPwmTimerCfg = LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_TIMER2_CC0);
-const LDMA_Descriptor_t ldmaPwmTimerDesc = LDMA_DESCRIPTOR_SINGLE_M2P_HALF(WS2812_bits, &TIMER2->CC[0].OCB, WS2812_BIT_SIZE);
+const LDMA_Descriptor_t ldmaPwmTimerDesc = LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(WS2812_bits, &TIMER2->CC[0].OCB, WS2812_BIT_SIZE);
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -107,11 +107,15 @@ void stripControllerHandler(void* pvParameter)
         osDelay(10);
         GPIO_PinOutToggle(test0_PORT, test0_PIN);
 
-        WS2812_bits[0] = WS2812_bit_0;
-        WS2812_bits[1] = WS2812_bit_1;
-        WS2812_bits[2] = WS2812_bit_0;
-        WS2812_bits[3] = WS2812_bit_1;
-        WS2812_bits[4] = 0;
+        WS2812_bits[0] = 10;
+        WS2812_bits[1] = 40;
+        WS2812_bits[2] = 20;
+        WS2812_bits[3] = 30;
+        WS2812_bits[4] = 40;
+        WS2812_bits[5] = 10;
+        WS2812_bits[6] = 30;
+        WS2812_bits[7] = 20;        
+        WS2812_bits[8] = 0;
         LDMA_StartTransfer(0, &ldmaPwmTimerCfg, &ldmaPwmTimerDesc);
     }
 }
