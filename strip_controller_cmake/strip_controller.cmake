@@ -1,4 +1,4 @@
-set(SDK_PATH "C:/Users/ep14231/SimplicityStudio/SDKs/simplicity_sdk_2")
+set(SDK_PATH "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2")
 set(COPIED_SDK_PATH "simplicity_sdk_2024.6.2")
 
 add_library(slc_strip_controller OBJECT
