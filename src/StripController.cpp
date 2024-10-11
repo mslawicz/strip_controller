@@ -27,7 +27,7 @@
       .xferCnt      = (count) - 1,                        \
       .byteSwap     = 0,                                  \
       .blockSize    = ldmaCtrlBlockSizeUnit1,             \
-      .doneIfs      = 1,                                  \
+      .doneIfs      = 0,                                  \
       .reqMode      = ldmaCtrlReqModeBlock,               \
       .decLoopCnt   = 0,                                  \
       .ignoreSrec   = 0,                                  \
@@ -44,10 +44,10 @@
     }                                                     \
   }
 
-static uint8_t WS2812_bits[WS2812_BIT_SIZE];   //PWM values of WS2812 bits
+static uint16_t WS2812_bits[WS2812_BIT_SIZE];   //PWM values of WS2812 bits
 // Configure DMA transfer
-static const LDMA_TransferCfg_t ldmaPwmTimerCfg = LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_TIMER2_CC0);
-static const LDMA_Descriptor_t ldmaPwmTimerDesc = LDMA_DESCRIPTOR_SINGLE_M2P_HALF(WS2812_bits, &TIMER2->CC[0].OC, WS2812_BIT_SIZE);
+const LDMA_TransferCfg_t ldmaPwmTimerCfg = LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_TIMER2_CC0);
+const LDMA_Descriptor_t ldmaPwmTimerDesc = LDMA_DESCRIPTOR_SINGLE_M2P_HALF(WS2812_bits, &TIMER2->CC[0].OCB, WS2812_BIT_SIZE);
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -62,13 +62,8 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
     .priority   = osPriorityBelowNormal
 };
 
-//calculate timer register CC value from PWM duty value
-uint32_t dutyToCC(sl_pwm_instance_t* pwmInstance, uint8_t pct)
-{
-  // read timer top value
-  uint32_t top = TIMER_TopGet(pwmInstance->timer);
-  return top * pct / 100;
-}
+static uint16_t WS2812_bit_0;
+static uint16_t WS2812_bit_1;
 
 void stripControllerHandler(void * pvParameter);
 
@@ -90,8 +85,13 @@ void stripControllerTaskInit(void)
     LDMA_Init(&ldmaInit);
     
     //start PWM generation with duty 0 (no wave)
-    sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 25);
+    sl_pwm_set_duty_cycle(&sl_pwm_WS2812_bit, 0);
     sl_pwm_start(&sl_pwm_WS2812_bit);
+
+    //calculate PWM timer OC values for WS2812 bits
+    uint32_t WS2812_timerTop = TIMER_TopGet((&sl_pwm_WS2812_bit)->timer);
+    WS2812_bit_0 = static_cast<uint16_t>(WS2812_timerTop * 33 / 100);  // duty 33%
+    WS2812_bit_1 = static_cast<uint16_t>(WS2812_timerTop * 66 / 100);  // duty 66%
 
     osThreadId_t stripControllerTaskHandle = osThreadNew(stripControllerHandler, nullptr, &stripControllerTaskAttr);
     if(stripControllerTaskHandle == 0)
@@ -107,10 +107,10 @@ void stripControllerHandler(void* pvParameter)
         osDelay(10);
         GPIO_PinOutToggle(test0_PORT, test0_PIN);
 
-        WS2812_bits[0] = dutyToCC(&sl_pwm_WS2812_bit, 33);
-        WS2812_bits[1] = dutyToCC(&sl_pwm_WS2812_bit, 66);
-        WS2812_bits[2] = dutyToCC(&sl_pwm_WS2812_bit, 33);
-        WS2812_bits[3] = dutyToCC(&sl_pwm_WS2812_bit, 66);
+        WS2812_bits[0] = WS2812_bit_0;
+        WS2812_bits[1] = WS2812_bit_1;
+        WS2812_bits[2] = WS2812_bit_0;
+        WS2812_bits[3] = WS2812_bit_1;
         WS2812_bits[4] = 0;
         LDMA_StartTransfer(0, &ldmaPwmTimerCfg, &ldmaPwmTimerDesc);
     }
