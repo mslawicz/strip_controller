@@ -77,14 +77,6 @@
 // [TIMER1]$
 
 // $[TIMER2]
-// TIMER2 CC0 on PA04
-#ifndef TIMER2_CC0_PORT                         
-#define TIMER2_CC0_PORT                          gpioPortA
-#endif
-#ifndef TIMER2_CC0_PIN                          
-#define TIMER2_CC0_PIN                           4
-#endif
-
 // [TIMER2]$
 
 // $[TIMER3]
@@ -94,6 +86,30 @@
 // [TIMER4]$
 
 // $[USART0]
+// USART0 CLK on PA01
+#ifndef USART0_CLK_PORT                         
+#define USART0_CLK_PORT                          gpioPortA
+#endif
+#ifndef USART0_CLK_PIN                          
+#define USART0_CLK_PIN                           1
+#endif
+
+// USART0 RX on PA02
+#ifndef USART0_RX_PORT                          
+#define USART0_RX_PORT                           gpioPortA
+#endif
+#ifndef USART0_RX_PIN                           
+#define USART0_RX_PIN                            2
+#endif
+
+// USART0 TX on PA04
+#ifndef USART0_TX_PORT                          
+#define USART0_TX_PORT                           gpioPortA
+#endif
+#ifndef USART0_TX_PIN                           
+#define USART0_TX_PIN                            4
+#endif
+
 // [USART0]$
 
 // $[I2C1]

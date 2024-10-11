@@ -75,6 +75,8 @@ component:
 - instance: [led0, led1]
   id: simple_led
 - {id: sl_system}
+- instance: [WS2812]
+  id: spidrv
 define:
 - {name: CHIP_CRYPTO_PLATFORM, value: '1'}
 - {name: _WANT_REENT_SMALL, value: '1'}
