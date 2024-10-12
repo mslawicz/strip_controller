@@ -68,6 +68,7 @@ void stripControllerHandler(void* pvParameter)
 
         if(flags & SC_EVENT_ACTION_REQ)
         {
+            GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
             // device data action request
             //XXX SPI test - send 9 bytes for one WS2812 device
             WS2812_buffer[0] = 0x9B;
@@ -81,20 +82,21 @@ void stripControllerHandler(void* pvParameter)
             WS2812_buffer[8] = 0xA6;            
             osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
             osTimerStart(stripControllerTimer, 20); //next event in 20 ms
+            GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
         }
 
-        if(flags && SC_EVENT_TRANSMIT_REQ)
+        if(flags & SC_EVENT_TRANSMIT_REQ)
         {
+            GPIO_PinOutSet(test1_PORT, test1_PIN);  //XXX test
             // WS2812 data transmit request
             WS2812_transmit();
+            GPIO_PinOutClear(test1_PORT, test1_PIN);  //XXX test
         }
     }
 }
 
 void WS2812_transmit(void)
 {
-    GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
-
     if(!WS2812_busy)
     {
         WS2812_busy = true;
@@ -105,9 +107,6 @@ void WS2812_transmit(void)
         //request transmit repetition because of possible updated data
         WS2812_repeat = true;
     }      
-
-    GPIO_PinOutToggle(test0_PORT, test0_PIN);  //XXX test
-    GPIO_PinOutToggle(test0_PORT, test0_PIN);  //XXX test
 }    
 
 void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred)
@@ -121,8 +120,6 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
             osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
             WS2812_repeat = false;
         }
-
-        GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
     }
 }
 
