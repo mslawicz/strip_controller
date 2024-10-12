@@ -7,6 +7,9 @@
 #define SC_TASK_STACK_SIZE (1024)
 #define WS2812_BUFFER_SIZE  9
 
+#define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
+                             SC_EVENT_TRANSMIT_REQ)
+
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
 constexpr osThreadAttr_t stripControllerTaskAttr =
@@ -48,11 +51,11 @@ void stripControllerTaskInit(void)
     stripControllerTimer = osTimerNew(stripControllerTimerCbk, osTimerOnce, nullptr, nullptr);
 
     osThreadId_t stripControllerTaskHandle = osThreadNew(stripControllerHandler, nullptr, &stripControllerTaskAttr);
-    osTimerStart(stripControllerTimer, 20); //XXX test
     if(stripControllerTaskHandle == 0)
     {
         SILABS_LOG("strip contrller task error");
     }
+    osTimerStart(stripControllerTimer, 20); //XXX test
 }
 
 void stripControllerHandler(void* pvParameter)
@@ -61,11 +64,11 @@ void stripControllerHandler(void* pvParameter)
 
     while(1)
     {
-        flags = osEventFlagsWait(stripControllerFlags, SC_EVENT_ACTION_REQ, osFlagsWaitAny, osWaitForever);
+        flags = osEventFlagsWait(stripControllerFlags, SC_EVENT_WAIT_FLAGS, osFlagsWaitAny, osWaitForever);
 
         if(flags & SC_EVENT_ACTION_REQ)
         {
-            // device action request
+            // device data action request
             //XXX SPI test - send 9 bytes for one WS2812 device
             WS2812_buffer[0] = 0x9B;
             WS2812_buffer[1] = 0x49;
@@ -76,8 +79,14 @@ void stripControllerHandler(void* pvParameter)
             WS2812_buffer[6] = 0xDB;
             WS2812_buffer[7] = 0x69;
             WS2812_buffer[8] = 0xA6;            
-            WS2812_transmit();
+            osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
             osTimerStart(stripControllerTimer, 20); //next event in 20 ms
+        }
+
+        if(flags && SC_EVENT_TRANSMIT_REQ)
+        {
+            // WS2812 data transmit request
+            WS2812_transmit();
         }
     }
 }
@@ -108,7 +117,8 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
         WS2812_busy = false;
         if(WS2812_repeat)
         {
-            //TODO send repetition event
+            // set next transmit request
+            osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
             WS2812_repeat = false;
         }
 
