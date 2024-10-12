@@ -5,9 +5,6 @@
 
 #define SC_EVENT_ACTION_REQ         (1UL << 0)    //WS2812 data action request
 #define SC_EVENT_TRANSMIT_REQ       (1UL << 1)    //WS2812 buffer transmit request
-
-#define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
-
 struct StripControllerParams_t
 {
     uint8_t* pBuffer = nullptr;     //strip components data buffer

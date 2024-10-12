@@ -6,6 +6,7 @@
 #include <cstring>
 
 #define SC_TASK_STACK_SIZE (1024)
+#define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define WS2812_BUFFER_SIZE  (9 * WS2812_NUMB_DEV)   //9 bytes for each WS2812 device
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
