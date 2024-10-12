@@ -6,11 +6,10 @@
 #include <cstring>
 
 #define SC_TASK_STACK_SIZE (1024)
-#define WS2812_BUFFER_SIZE  9
+#define WS2812_BUFFER_SIZE  (9 * WS2812_NUMB_DEV)   //9 bytes for each WS2812 device
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
-                             SC_EVENT_TRANSMIT_REQ)
-                        
+                             SC_EVENT_TRANSMIT_REQ)                      
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -32,7 +31,8 @@ osTimerId_t stripControllerTimer;
 osEventFlagsId_t stripControllerFlags;
 StripControllerParams_t stripControllerParams =
 {
-    .pBuffer = WS2812_buffer
+    .pBuffer = WS2812_buffer,
+    .numberOfDevices = WS2812_NUMB_DEV
 };
 StripController stripController(stripControllerParams);
 
