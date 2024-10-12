@@ -3,12 +3,14 @@
 #include "em_gpio.h"    //XXX test
 #include "pin_config.h" //XXX test
 #include "sl_spidrv_instances.h"
+#include <cstring>
 
 #define SC_TASK_STACK_SIZE (1024)
 #define WS2812_BUFFER_SIZE  9
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
                              SC_EVENT_TRANSMIT_REQ)
+                        
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -28,22 +30,16 @@ static volatile bool WS2812_busy = false;
 static volatile bool WS2812_repeat = false;
 osTimerId_t stripControllerTimer;
 osEventFlagsId_t stripControllerFlags;
+StripControllerParams_t stripControllerParams =
+{
+    .pBuffer = WS2812_buffer
+};
+StripController stripController(stripControllerParams);
 
 void stripControllerHandler(void * pvParameter);
 void WS2812_transmit(void);
 void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred);
 void stripControllerTimerCbk(void *arg);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-local-addr"
-
-StripController& StripController::getInstance(void)
-{ 
-    StripController instance;
-    return instance;
-}
-
-#pragma GCC diagnostic pop
 
 void stripControllerTaskInit(void)
 {
@@ -70,18 +66,11 @@ void stripControllerHandler(void* pvParameter)
         {
             GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
             // device data action request
-            //XXX SPI test - send 9 bytes for one WS2812 device
-            WS2812_buffer[0] = 0x9B;
-            WS2812_buffer[1] = 0x49;
-            WS2812_buffer[2] = 0xB4;
-            WS2812_buffer[3] = 0x93;
-            WS2812_buffer[4] = 0x4D;
-            WS2812_buffer[5] = 0xA4;
-            WS2812_buffer[6] = 0xDB;
-            WS2812_buffer[7] = 0x69;
-            WS2812_buffer[8] = 0xA6;            
-            osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
-            osTimerStart(stripControllerTimer, 20); //next event in 20 ms
+            uint32_t timeToNextAction = stripController.action();
+            if(timeToNextAction != 0)
+            {
+                osTimerStart(stripControllerTimer, timeToNextAction); //next action will be called in timeToNextAction
+            }
             GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
         }
 
@@ -126,4 +115,18 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
 void stripControllerTimerCbk(void *arg)
 {
     osEventFlagsSet(stripControllerFlags, SC_EVENT_ACTION_REQ);
+}
+
+StripController::StripController(StripControllerParams_t& params) :
+    params(params)
+{
+
+}
+
+uint32_t StripController::action(void)
+{
+    uint8_t testBuffer[] = {0x92, 0x49, 0xA4, 0x92, 0x49, 0x24, 0x92, 0x49, 0x24};  //green
+    std::memcpy(params.pBuffer, testBuffer, sizeof(testBuffer));
+    osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
+    return 20;
 }

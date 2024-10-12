@@ -6,13 +6,18 @@
 #define SC_EVENT_ACTION_REQ         (1UL << 0)    //WS2812 data action request
 #define SC_EVENT_TRANSMIT_REQ       (1UL << 1)    //WS2812 buffer transmit request
 
+struct StripControllerParams_t
+{
+    uint8_t* pBuffer = nullptr;
+};  
 class StripController
 {
     public:
-    static StripController& getInstance(void);
+    StripController(StripControllerParams_t& params);
+    uint32_t action(void);
 
     private:
-    StripController() = default;
+    StripControllerParams_t& params;
 };
 
 void stripControllerTaskInit(void);
