@@ -21,6 +21,8 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
 };
 
 uint8_t WS2812_buffer[WS2812_BUFFER_SIZE];
+static volatile bool WS2812_busy = false;
+static volatile bool WS2812_repeat = false;
 
 void stripControllerHandler(void * pvParameter);
 void WS2812_transmit(void);
@@ -63,16 +65,34 @@ void stripControllerHandler(void* pvParameter)
 
 void WS2812_transmit(void)
 {
-    GPIO_PinOutSet(test0_PORT, test0_PIN);
-    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
-    GPIO_PinOutToggle(test0_PORT, test0_PIN);
-    GPIO_PinOutToggle(test0_PORT, test0_PIN);
+    GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
+
+    if(!WS2812_busy)
+    {
+        WS2812_busy = true;
+        SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
+    }
+    else
+    {
+        //request transmit repetition because of possible updated data
+        WS2812_repeat = true;
+    }      
+
+    GPIO_PinOutToggle(test0_PORT, test0_PIN);  //XXX test
+    GPIO_PinOutToggle(test0_PORT, test0_PIN);  //XXX test
 }    
 
 void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred)
 {
     if (transferStatus == ECODE_EMDRV_SPIDRV_OK)
     {
-        GPIO_PinOutClear(test0_PORT, test0_PIN);
+        WS2812_busy = false;
+        if(WS2812_repeat)
+        {
+            //TODO send repetition event
+            WS2812_repeat = false;
+        }
+
+        GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
     }
 }
