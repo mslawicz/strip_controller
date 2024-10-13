@@ -157,8 +157,29 @@ void StripController::colorAction(void)
 
 
     //XXX test: this action needs next pass - normally dependent on color mode
-    eventRequest |= SC_EVENT_COLOR_ACTION;
-    nextActionRequest = true; //XXX test
+    requestEvent(SC_EVENT_COLOR_ACTION);    //XXX test
+}
+
+void StripController::levelAction(void)
+{
+    //set transmit event to show the applied level changes
+    osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
+
+    if((currentLevel == targetLevel) || (levelTransitionSteps <2))
+    {
+        currentLevel = targetLevel;
+        levelTransitionSteps = 0;
+    }
+    else
+    {
+        //transitional step
+        int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
+        currentLevel += nextLevelChange;
+        levelTransitionSteps--;
+        requestEvent(SC_EVENT_LEVEL_ACTION);
+    }
+
+
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
@@ -187,8 +208,6 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t lev
     static constexpr uint16_t MaxLevel = 25500; //max level 255 multiplied by 100
     static constexpr uint16_t MaxLevel_2 = 12750; //max level 255 multiplied by 100 and halfed
     uint16_t correctedLevel = level * level / MaxLevel;     //corrected level in range <0,25500>
-    uint8_t tst = static_cast<uint8_t>(RGB_data.G * correctedLevel / MaxLevel);
-    (void)tst;
     //WS2812 requires G-R-B order of bytes
     byteToPulses(pBuffer, static_cast<uint8_t>((RGB_data.G * correctedLevel + MaxLevel_2)/ MaxLevel));
     byteToPulses(pBuffer + 3, static_cast<uint8_t>((RGB_data.R * correctedLevel + MaxLevel_2)/ MaxLevel));
@@ -202,4 +221,11 @@ void StripController::setFixedColor(void)
     {
         RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentFixedColor, currentLevel);
     }
+}
+
+//request an event to be set by the callback function
+void StripController::requestEvent(uint32_t flags)
+{
+    eventRequest |= flags;
+    nextActionRequest = true; 
 }
