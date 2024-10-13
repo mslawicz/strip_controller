@@ -7,7 +7,8 @@
 
 #define SC_TASK_STACK_SIZE (1024)
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
-#define WS2812_BUFFER_SIZE  (9 * WS2812_NUMB_DEV)   //9 bytes for each WS2812 device
+#define WS2812_DEV_SIZE     9   //number of pulse-coded bytes for each WS2812 device
+#define WS2812_BUFFER_SIZE  (WS2812_DEV_SIZE * WS2812_NUMB_DEV)   //number of pulse-coded bytes for all WS2812 devices
 #define MAX_U8  0xFF
 #define ACTION_PERIOD   40  //action period 40 ms = 25 Hz
 
@@ -55,7 +56,7 @@ void stripControllerTaskInit(void)
         SILABS_LOG("strip contrller task error");
     }
 
-    //init the first action to set the devices
+    //init the first action to set the WS2812 devices
     stripController.eventRequest = SC_EVENT_COLOR_ACTION;
     osTimerStart(actionTimer, ACTION_PERIOD);
 }
@@ -136,22 +137,21 @@ StripController::StripController(StripControllerParams_t& params) :
 
 void StripController::colorAction(void)
 {
-    uint8_t fc = 255;
-    uint8_t hc = fc / 2;
-    uint8_t qc = 255;
-    uint8_t lvl = 30;
-    RGBToPulses(params.pBuffer, RGB_t{fc,0,0}, lvl);     //XXX test red
-    RGBToPulses(params.pBuffer+9, RGB_t{hc,hc,0}, lvl);     //XXX test yellow
-    RGBToPulses(params.pBuffer+18, RGB_t{0,fc,0}, lvl);     //XXX test green
-    RGBToPulses(params.pBuffer+27, RGB_t{0,hc,hc}, lvl);     //XXX test cyan
-    RGBToPulses(params.pBuffer+36, RGB_t{0,0,fc}, lvl);     //XXX test blue
-    RGBToPulses(params.pBuffer+45, RGB_t{hc,0,hc}, lvl);     //XXX test magenta
-    RGBToPulses(params.pBuffer+54, RGB_t{qc,qc,qc}, lvl);     //XXX test gray
-    RGBToPulses(params.pBuffer+63, RGB_t{qc,qc,qc}, lvl / 2);     //XXX test gray    
+    switch(colorMode)
+    {
+        case ColorMode::FixedColor:
+        setFixedColor();
+        break;
+
+        default:
+        break;
+    }
+
     //set transmit event to show the applied color changes
     osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
 
-    //XXX test: this action needs next pass
+
+    //XXX test: this action needs next pass - normally dependent on color mode
     eventRequest |= SC_EVENT_COLOR_ACTION;
     nextActionRequest = true; //XXX test
 }
@@ -182,4 +182,13 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
     byteToPulses(pBuffer, static_cast<uint8_t>(RGB_data.G * level / MAX_U8));
     byteToPulses(pBuffer + 3, static_cast<uint8_t>(RGB_data.R * level / MAX_U8));
     byteToPulses(pBuffer + 6, static_cast<uint8_t>(RGB_data.B * level / MAX_U8));
+}
+
+void StripController::setFixedColor(void)
+{
+    //set fixed color and level to all devices
+    for(uint16_t dev = 0; dev < WS2812_NUMB_DEV; dev++)
+    {
+        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentFixedColor, currentLevel);
+    }
 }

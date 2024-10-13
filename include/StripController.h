@@ -18,6 +18,11 @@ struct RGB_t
     uint8_t G;
     uint8_t B;
 };
+
+enum class ColorMode : uint8_t
+{
+    FixedColor
+};
 class StripController
 {
     public:
@@ -28,8 +33,12 @@ class StripController
 
     private:
     StripControllerParams_t& params;
+    ColorMode colorMode{ColorMode::FixedColor};
+    uint8_t currentLevel{30};
+    RGB_t currentFixedColor{0xFF, 0xFF, 0xFF};
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
     void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
+    void setFixedColor(void);
 };
 
 void stripControllerTaskInit(void);
