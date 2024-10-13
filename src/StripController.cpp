@@ -9,11 +9,11 @@
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define WS2812_DEV_SIZE     9   //number of pulse-coded bytes for each WS2812 device
 #define WS2812_BUFFER_SIZE  (WS2812_DEV_SIZE * WS2812_NUMB_DEV)   //number of pulse-coded bytes for all WS2812 devices
-#define MAX_U8  0xFF
 #define ACTION_PERIOD   40  //action period 40 ms = 25 Hz
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_TRANSMIT_REQ | \
-                             SC_EVENT_COLOR_ACTION)                      
+                             SC_EVENT_COLOR_ACTION | \
+                             SC_EVENT_LEVEL_ACTION)                      
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -73,23 +73,19 @@ void stripControllerHandler(void* pvParameter)
 
         if(flags & SC_EVENT_COLOR_ACTION)
         {
-            GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
             // device data action request
             stripController.colorAction();
-            GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
         }
 
         if(flags & SC_EVENT_LEVEL_ACTION)
         {
-
+            stripController.levelAction();
         }
 
         if(flags & SC_EVENT_TRANSMIT_REQ)
         {
-            GPIO_PinOutSet(test1_PORT, test1_PIN);  //XXX test
             // WS2812 data transmit request
             WS2812_transmit();
-            GPIO_PinOutClear(test1_PORT, test1_PIN);  //XXX test
         }
 
         if(stripController.nextActionRequest)
@@ -158,10 +154,18 @@ void StripController::colorAction(void)
 
     //XXX test: this action needs next pass - normally dependent on color mode
     requestEvent(SC_EVENT_COLOR_ACTION);    //XXX test
+    if(levelTransitionSteps == 0)
+    {
+        currentLevel = 0;
+        targetLevel = 25500;
+        levelTransitionSteps = 3000 / 40;   //3 seconds
+        requestEvent(SC_EVENT_LEVEL_ACTION);
+    }
 }
 
 void StripController::levelAction(void)
 {
+    GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
     //set transmit event to show the applied level changes
     osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
 
@@ -172,14 +176,16 @@ void StripController::levelAction(void)
     }
     else
     {
+        GPIO_PinOutSet(test1_PORT, test1_PIN);  //XXX test
         //transitional step
         int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
         currentLevel += nextLevelChange;
         levelTransitionSteps--;
         requestEvent(SC_EVENT_LEVEL_ACTION);
+        GPIO_PinOutClear(test1_PORT, test1_PIN);  //XXX test
     }
 
-
+    GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
