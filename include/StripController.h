@@ -26,7 +26,7 @@ class StripController
     private:
     StripControllerParams_t& params;
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
-    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data);
+    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
 };
 
 void stripControllerTaskInit(void);

@@ -8,6 +8,7 @@
 #define SC_TASK_STACK_SIZE (1024)
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define WS2812_BUFFER_SIZE  (9 * WS2812_NUMB_DEV)   //9 bytes for each WS2812 device
+#define MAX_U8  0xFF
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
                              SC_EVENT_TRANSMIT_REQ)                      
@@ -126,17 +127,18 @@ StripController::StripController(StripControllerParams_t& params) :
 
 uint32_t StripController::action(void)
 {
-    uint8_t fc = 30;
+    uint8_t fc = 255;
     uint8_t hc = fc / 2;
-    uint8_t qc = fc / 3;
-    RGBToPulses(params.pBuffer, RGB_t{fc,0,0});     //XXX test red
-    RGBToPulses(params.pBuffer+9, RGB_t{hc,hc,0});     //XXX test yellow
-    RGBToPulses(params.pBuffer+18, RGB_t{0,fc,0});     //XXX test green
-    RGBToPulses(params.pBuffer+27, RGB_t{0,hc,hc});     //XXX test cyan
-    RGBToPulses(params.pBuffer+36, RGB_t{0,0,fc});     //XXX test blue
-    RGBToPulses(params.pBuffer+45, RGB_t{hc,0,hc});     //XXX test magenta
-    RGBToPulses(params.pBuffer+54, RGB_t{qc,qc,qc});     //XXX test gray
-    RGBToPulses(params.pBuffer+63, RGB_t{qc,qc,qc});     //XXX test gray    
+    uint8_t qc = 255;
+    uint8_t lvl = 30;
+    RGBToPulses(params.pBuffer, RGB_t{fc,0,0}, lvl);     //XXX test red
+    RGBToPulses(params.pBuffer+9, RGB_t{hc,hc,0}, lvl);     //XXX test yellow
+    RGBToPulses(params.pBuffer+18, RGB_t{0,fc,0}, lvl);     //XXX test green
+    RGBToPulses(params.pBuffer+27, RGB_t{0,hc,hc}, lvl);     //XXX test cyan
+    RGBToPulses(params.pBuffer+36, RGB_t{0,0,fc}, lvl);     //XXX test blue
+    RGBToPulses(params.pBuffer+45, RGB_t{hc,0,hc}, lvl);     //XXX test magenta
+    RGBToPulses(params.pBuffer+54, RGB_t{qc,qc,qc}, lvl);     //XXX test gray
+    RGBToPulses(params.pBuffer+63, RGB_t{qc,qc,qc}, lvl / 2);     //XXX test gray    
 
     osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
     return 20;
@@ -161,11 +163,11 @@ void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
     *(pBuffer + 2) = pulseBuffer & 0xFF;
 }
 
-//codes 3 bytes of RGB color value into 9 bytes of WS2812 coded pulses at the address pBuffer
-void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data)
+//codes 3 bytes of RGB color value and level value into 9 bytes of WS2812 coded pulses at the address pBuffer
+void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level)
 {
     //WS2812 requires G-R-B order of bytes
-    byteToPulses(pBuffer, RGB_data.G);
-    byteToPulses(pBuffer + 3, RGB_data.R);
-    byteToPulses(pBuffer + 6, RGB_data.B);
+    byteToPulses(pBuffer, static_cast<uint8_t>(RGB_data.G * level / MAX_U8));
+    byteToPulses(pBuffer + 3, static_cast<uint8_t>(RGB_data.R * level / MAX_U8));
+    byteToPulses(pBuffer + 6, static_cast<uint8_t>(RGB_data.B * level / MAX_U8));
 }
