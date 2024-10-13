@@ -156,9 +156,9 @@ void StripController::colorAction(void)
     requestEvent(SC_EVENT_COLOR_ACTION);    //XXX test
     if(levelTransitionSteps == 0)
     {
-        currentLevel = 0;
-        targetLevel = 25500;
-        levelTransitionSteps = 3000 / 40;   //3 seconds
+        currentLevel = 25500;
+        targetLevel = 0;
+        levelTransitionSteps = 5000 / 40;   //3 seconds
         requestEvent(SC_EVENT_LEVEL_ACTION);
     }
 }
