@@ -79,6 +79,11 @@ void stripControllerHandler(void* pvParameter)
             GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
         }
 
+        if(flags & SC_EVENT_LEVEL_ACTION)
+        {
+
+        }
+
         if(flags & SC_EVENT_TRANSMIT_REQ)
         {
             GPIO_PinOutSet(test1_PORT, test1_PIN);  //XXX test
@@ -176,12 +181,18 @@ void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 }
 
 //codes 3 bytes of RGB color value and level value into 9 bytes of WS2812 coded pulses at the address pBuffer
-void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level)
+void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level)
 {
+    //apply level gamma correction
+    static constexpr uint16_t MaxLevel = 25500; //max level 255 multiplied by 100
+    static constexpr uint16_t MaxLevel_2 = 12750; //max level 255 multiplied by 100 and halfed
+    uint16_t correctedLevel = level * level / MaxLevel;     //corrected level in range <0,25500>
+    uint8_t tst = static_cast<uint8_t>(RGB_data.G * correctedLevel / MaxLevel);
+    (void)tst;
     //WS2812 requires G-R-B order of bytes
-    byteToPulses(pBuffer, static_cast<uint8_t>(RGB_data.G * level / MAX_U8));
-    byteToPulses(pBuffer + 3, static_cast<uint8_t>(RGB_data.R * level / MAX_U8));
-    byteToPulses(pBuffer + 6, static_cast<uint8_t>(RGB_data.B * level / MAX_U8));
+    byteToPulses(pBuffer, static_cast<uint8_t>((RGB_data.G * correctedLevel + MaxLevel_2)/ MaxLevel));
+    byteToPulses(pBuffer + 3, static_cast<uint8_t>((RGB_data.R * correctedLevel + MaxLevel_2)/ MaxLevel));
+    byteToPulses(pBuffer + 6, static_cast<uint8_t>((RGB_data.B * correctedLevel + MaxLevel_2)/ MaxLevel));
 }
 
 void StripController::setFixedColor(void)

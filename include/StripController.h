@@ -34,10 +34,12 @@ class StripController
     private:
     StripControllerParams_t& params;
     ColorMode colorMode{ColorMode::FixedColor};
-    uint8_t currentLevel{30};
+    uint16_t currentLevel{4000};    //device light level (0-255) multiplied by 100
+    uint16_t targetLevel{currentLevel};
+    uint16_t levelTransitionSteps{0};
     RGB_t currentFixedColor{0xFF, 0xFF, 0xFF};
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
-    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
+    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level);
     void setFixedColor(void);
 };
 
