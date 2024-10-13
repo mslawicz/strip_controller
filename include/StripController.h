@@ -3,8 +3,9 @@
 #include "cmsis_os2.h"
 #include "sl_cmsis_os2_common.h"
 
-#define SC_EVENT_ACTION_REQ         (1UL << 0)    //WS2812 data action request
-#define SC_EVENT_TRANSMIT_REQ       (1UL << 1)    //WS2812 buffer transmit request
+#define SC_EVENT_TRANSMIT_REQ       (1UL << 0)    //WS2812 buffer transmit request
+#define SC_EVENT_COLOR_ACTION       (1UL << 1)    //WS2812 color action request
+#define SC_EVENT_LEVEL_ACTION       (1UL << 2)    //WS2812 level action request
 struct StripControllerParams_t
 {
     uint8_t* pBuffer = nullptr;     //strip components data buffer
@@ -20,8 +21,10 @@ struct RGB_t
 class StripController
 {
     public:
+    bool nextActionRequest{false};
+    uint32_t eventRequest{0};   //event flags to be set in action timer callback
     StripController(StripControllerParams_t& params);
-    uint32_t action(void);
+    void colorAction(void);
 
     private:
     StripControllerParams_t& params;

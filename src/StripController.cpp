@@ -9,9 +9,10 @@
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define WS2812_BUFFER_SIZE  (9 * WS2812_NUMB_DEV)   //9 bytes for each WS2812 device
 #define MAX_U8  0xFF
+#define ACTION_PERIOD   40  //action period 40 ms = 25 Hz
 
-#define SC_EVENT_WAIT_FLAGS (SC_EVENT_ACTION_REQ | \
-                             SC_EVENT_TRANSMIT_REQ)                      
+#define SC_EVENT_WAIT_FLAGS (SC_EVENT_TRANSMIT_REQ | \
+                             SC_EVENT_COLOR_ACTION)                      
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -29,7 +30,7 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
 uint8_t WS2812_buffer[WS2812_BUFFER_SIZE];
 static volatile bool WS2812_busy = false;
 static volatile bool WS2812_repeat = false;
-osTimerId_t stripControllerTimer;
+osTimerId_t actionTimer;
 osEventFlagsId_t stripControllerFlags;
 StripControllerParams_t stripControllerParams =
 {
@@ -41,19 +42,22 @@ StripController stripController(stripControllerParams);
 void stripControllerHandler(void * pvParameter);
 void WS2812_transmit(void);
 void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred);
-void stripControllerTimerCbk(void *arg);
+void actionTimerCbk(void *arg);
 
 void stripControllerTaskInit(void)
 {
     stripControllerFlags = osEventFlagsNew(NULL);
-    stripControllerTimer = osTimerNew(stripControllerTimerCbk, osTimerOnce, nullptr, nullptr);
+    actionTimer = osTimerNew(actionTimerCbk, osTimerOnce, nullptr, nullptr);
 
     osThreadId_t stripControllerTaskHandle = osThreadNew(stripControllerHandler, nullptr, &stripControllerTaskAttr);
     if(stripControllerTaskHandle == 0)
     {
         SILABS_LOG("strip contrller task error");
     }
-    osTimerStart(stripControllerTimer, 20); //XXX test
+
+    //init the first action to set the devices
+    stripController.eventRequest = SC_EVENT_COLOR_ACTION;
+    osTimerStart(actionTimer, ACTION_PERIOD);
 }
 
 void stripControllerHandler(void* pvParameter)
@@ -64,15 +68,13 @@ void stripControllerHandler(void* pvParameter)
     {
         flags = osEventFlagsWait(stripControllerFlags, SC_EVENT_WAIT_FLAGS, osFlagsWaitAny, osWaitForever);
 
-        if(flags & SC_EVENT_ACTION_REQ)
+        stripController.nextActionRequest = false;
+
+        if(flags & SC_EVENT_COLOR_ACTION)
         {
             GPIO_PinOutSet(test0_PORT, test0_PIN);  //XXX test
             // device data action request
-            uint32_t timeToNextAction = stripController.action();
-            if(timeToNextAction != 0)
-            {
-                osTimerStart(stripControllerTimer, timeToNextAction); //next action will be called in timeToNextAction
-            }
+            stripController.colorAction();
             GPIO_PinOutClear(test0_PORT, test0_PIN);  //XXX test
         }
 
@@ -82,6 +84,12 @@ void stripControllerHandler(void* pvParameter)
             // WS2812 data transmit request
             WS2812_transmit();
             GPIO_PinOutClear(test1_PORT, test1_PIN);  //XXX test
+        }
+
+        if(stripController.nextActionRequest)
+        {
+            //some actions need another pass - start timer to trig the event
+            osTimerStart(actionTimer, ACTION_PERIOD);
         }
     }
 }
@@ -114,9 +122,10 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
     }
 }
 
-void stripControllerTimerCbk(void *arg)
+void actionTimerCbk(void *arg)
 {
-    osEventFlagsSet(stripControllerFlags, SC_EVENT_ACTION_REQ);
+    osEventFlagsSet(stripControllerFlags, stripController.eventRequest);
+    stripController.eventRequest = 0;
 }
 
 StripController::StripController(StripControllerParams_t& params) :
@@ -125,7 +134,7 @@ StripController::StripController(StripControllerParams_t& params) :
 
 }
 
-uint32_t StripController::action(void)
+void StripController::colorAction(void)
 {
     uint8_t fc = 255;
     uint8_t hc = fc / 2;
@@ -139,9 +148,12 @@ uint32_t StripController::action(void)
     RGBToPulses(params.pBuffer+45, RGB_t{hc,0,hc}, lvl);     //XXX test magenta
     RGBToPulses(params.pBuffer+54, RGB_t{qc,qc,qc}, lvl);     //XXX test gray
     RGBToPulses(params.pBuffer+63, RGB_t{qc,qc,qc}, lvl / 2);     //XXX test gray    
-
+    //set transmit event to show the applied color changes
     osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
-    return 20;
+
+    //XXX test: this action needs next pass
+    eventRequest |= SC_EVENT_COLOR_ACTION;
+    nextActionRequest = true; //XXX test
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
