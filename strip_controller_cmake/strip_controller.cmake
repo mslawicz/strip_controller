@@ -1,4 +1,5 @@
-set(SDK_PATH "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2")
+include(user.cmake)
+set(SDK_PATH ${USER_SDK})
 set(COPIED_SDK_PATH "simplicity_sdk_2024.6.2")
 
 add_library(slc_strip_controller OBJECT
