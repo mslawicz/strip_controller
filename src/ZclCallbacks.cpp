@@ -28,6 +28,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "StripController.h"
+
 #ifdef DIC_ENABLE
 #include "dic.h"
 #endif // DIC_ENABLE
@@ -54,7 +56,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        // WIP Apply attribute change to Light
+        // Apply attribute change to Light
+        if(type == 32)
+        {
+            stripController.setTargetLevel(*value);
+            osEventFlagsSet(stripControllerFlags, SC_EVENT_LEVEL_ACTION);
+            ChipLogProgress(Zcl, "-------> stripController.targetLevel = %u", stripController.getTargetLevel());
+        }
     }
     else if (clusterId == ColorControl::Id)
     {

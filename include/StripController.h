@@ -31,6 +31,8 @@ class StripController
     StripController(StripControllerParams_t& params);
     void colorAction(void);
     void levelAction(void);
+    void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
+    uint8_t getTargetLevel(void) { return targetLevel / 100; }
 
     private:
     StripControllerParams_t& params;
@@ -44,5 +46,8 @@ class StripController
     void setFixedColor(void);
     void requestEvent(uint32_t flags);
 };
+
+extern osEventFlagsId_t stripControllerFlags;
+extern StripController stripController;
 
 void stripControllerTaskInit(void);
