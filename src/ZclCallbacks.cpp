@@ -61,7 +61,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             stripController.setTargetLevel(*value);
             osEventFlagsSet(stripControllerFlags, SC_EVENT_LEVEL_ACTION);
-            ChipLogProgress(Zcl, "-------> stripController.targetLevel = %u", stripController.getTargetLevel());
         }
     }
     else if (clusterId == ColorControl::Id)

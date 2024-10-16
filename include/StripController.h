@@ -2,6 +2,9 @@
 
 #include "cmsis_os2.h"
 #include "sl_cmsis_os2_common.h"
+#include <array>
+
+#define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 
 #define SC_EVENT_TRANSMIT_REQ       (1UL << 0)    //WS2812 buffer transmit request
 #define SC_EVENT_COLOR_ACTION       (1UL << 1)    //WS2812 color action request
@@ -26,13 +29,11 @@ enum class ColorMode : uint8_t
 class StripController
 {
     public:
-    bool nextActionRequest{false};
     volatile uint32_t eventRequest{0};   //event flags to be set in action timer callback
     StripController(StripControllerParams_t& params);
     void colorAction(void);
     void levelAction(void);
     void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
-    uint8_t getTargetLevel(void) { return targetLevel / 100; }
 
     private:
     StripControllerParams_t& params;
@@ -41,10 +42,10 @@ class StripController
     uint16_t targetLevel{currentLevel};     //device light target level (0-255) multiplied by 100
     uint16_t levelTransitionSteps{0};
     RGB_t currentFixedColor{0xFF, 0xFF, 0xFF};
+    std::array<RGB_t, WS2812_NUMB_DEV> RGB_buffer{0};
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
     void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level);
     void setFixedColor(void);
-    void requestEvent(uint32_t flags);
 };
 
 extern osEventFlagsId_t stripControllerFlags;

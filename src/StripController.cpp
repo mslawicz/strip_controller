@@ -6,7 +6,6 @@
 #include <cstring>
 
 #define SC_TASK_STACK_SIZE (1024)
-#define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define WS2812_DEV_SIZE     9   //number of pulse-coded bytes for each WS2812 device
 #define WS2812_BUFFER_SIZE  (WS2812_DEV_SIZE * WS2812_NUMB_DEV)   //number of pulse-coded bytes for all WS2812 devices
 #define ACTION_PERIOD   40  //action period 40 ms = 25 Hz
@@ -69,7 +68,10 @@ void stripControllerHandler(void* pvParameter)
     {
         flags = osEventFlagsWait(stripControllerFlags, SC_EVENT_WAIT_FLAGS, osFlagsWaitAny, osWaitForever);
 
-        stripController.nextActionRequest = false;
+        if(flags & SC_EVENT_LEVEL_ACTION)
+        {
+            stripController.levelAction();
+        }
 
         if(flags & SC_EVENT_COLOR_ACTION)
         {
@@ -77,21 +79,10 @@ void stripControllerHandler(void* pvParameter)
             stripController.colorAction();
         }
 
-        if(flags & SC_EVENT_LEVEL_ACTION)
-        {
-            stripController.levelAction();
-        }
-
         if(flags & SC_EVENT_TRANSMIT_REQ)
         {
             // WS2812 data transmit request
             WS2812_transmit();
-        }
-
-        if(stripController.nextActionRequest)
-        {
-            //some actions need another pass - start timer to trig the event
-            osTimerStart(actionTimer, ACTION_PERIOD);
         }
     }
 }
@@ -154,9 +145,6 @@ void StripController::colorAction(void)
 
 void StripController::levelAction(void)
 {
-    //set transmit event to show the applied level changes
-    osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
-
     if((currentLevel == targetLevel) || (levelTransitionSteps <2))
     {
         currentLevel = targetLevel;
@@ -168,8 +156,10 @@ void StripController::levelAction(void)
         int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
         currentLevel += nextLevelChange;
         levelTransitionSteps--;
-        requestEvent(SC_EVENT_LEVEL_ACTION);
     }
+
+    //set color action event to show the applied level changes
+    osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
@@ -213,9 +203,3 @@ void StripController::setFixedColor(void)
     }
 }
 
-//request an event to be set by the callback function
-void StripController::requestEvent(uint32_t flags)
-{
-    eventRequest |= flags;
-    nextActionRequest = true; 
-}
