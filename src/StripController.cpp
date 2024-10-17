@@ -184,14 +184,21 @@ void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 //codes 3 bytes of RGB color value and level value into 9 bytes of WS2812 coded pulses at the address pBuffer
 void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level)
 {
-    //apply level gamma correction
+    //function for gamma correction of level
     static constexpr uint16_t MaxLevel = 25500; //max level 255 multiplied by 100
     static constexpr uint16_t MaxLevel_2 = 12750; //max level 255 multiplied by 100 and halfed
     uint16_t correctedLevel = level * level / MaxLevel;     //corrected level in range <0,25500>
+
+    auto gammaCorrection = [&](uint8_t colorValue, uint16_t level) -> uint8_t
+    {
+        uint8_t correctedColorValue = static_cast<uint8_t>((colorValue * correctedLevel + MaxLevel_2)/ MaxLevel);
+        return ((correctedColorValue == 0) && (colorValue > 0)) ? 1 : correctedColorValue;
+    };
+
     //WS2812 requires G-R-B order of bytes
-    byteToPulses(pBuffer, static_cast<uint8_t>((RGB_data.G * correctedLevel + MaxLevel_2)/ MaxLevel));
-    byteToPulses(pBuffer + 3, static_cast<uint8_t>((RGB_data.R * correctedLevel + MaxLevel_2)/ MaxLevel));
-    byteToPulses(pBuffer + 6, static_cast<uint8_t>((RGB_data.B * correctedLevel + MaxLevel_2)/ MaxLevel));
+    byteToPulses(pBuffer, gammaCorrection(RGB_data.G, level));
+    byteToPulses(pBuffer + 3, gammaCorrection(RGB_data.R, level));
+    byteToPulses(pBuffer + 6, gammaCorrection(RGB_data.B, level));
 }
 
 void StripController::setFixedColor(void)
