@@ -34,9 +34,11 @@ class StripController
     void colorAction(void);
     void levelAction(void);
     void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
+    void turnOn(bool state) { turnedOn = state; }
 
     private:
     StripControllerParams_t& params;
+    bool turnedOn{false};       //current on/off state
     ColorMode colorMode{ColorMode::FixedColor};
     uint16_t currentLevel{4000};    //device light current level (0-255) multiplied by 100
     uint16_t targetLevel{currentLevel};     //device light target level (0-255) multiplied by 100

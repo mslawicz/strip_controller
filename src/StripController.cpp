@@ -167,6 +167,12 @@ void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 {
     uint32_t pulseBuffer = 0;
 
+    //all bits to 0 if the strip is in off state
+    if(!turnedOn)
+    {
+        colorData = 0;
+    }
+
     for(uint8_t bit = 0; bit < 8; bit++)
     {
         pulseBuffer <<= 3;
