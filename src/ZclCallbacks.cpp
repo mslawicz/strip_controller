@@ -56,7 +56,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        // Apply attribute change to Light
+        // Apply level attribute change to Light
         if(type == 32)
         {
             stripController.setTargetLevel(*value);
@@ -68,7 +68,20 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        // WIP Apply attribute change to Light
+        // Apply hue and saturation attributes change to Light
+        if(attributeId == 0x00000000)
+        {
+            //hue attribute
+            stripController.setHue(*value);
+        }
+
+        if(attributeId == 0x00000001)
+        {
+            //saturation attribute
+            stripController.setSaturation(*value);
+            //saturation attribute always follows hue attribute - proceed with the event now
+            osEventFlagsSet(stripControllerFlags, SC_EVENT_SET_HS_ACTION);
+        }        
     }
     else if (clusterId == OnOffSwitchConfiguration::Id)
     {

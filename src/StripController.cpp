@@ -12,7 +12,8 @@
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_TRANSMIT_REQ | \
                              SC_EVENT_COLOR_ACTION | \
-                             SC_EVENT_LEVEL_ACTION)                      
+                             SC_EVENT_LEVEL_ACTION | \
+                             SC_EVENT_SET_HS_ACTION)                      
 
 uint8_t stripControllerStack[SC_TASK_STACK_SIZE];
 osThread_t stripControllerTaskControlBlock;
@@ -75,8 +76,14 @@ void stripControllerHandler(void* pvParameter)
 
         if(flags & SC_EVENT_COLOR_ACTION)
         {
-            // device data action request
+            // device color handling action request
             stripController.colorAction();
+        }
+
+        if(flags & SC_EVENT_SET_HS_ACTION)
+        {
+            // set new fixed color from hue and saturation
+            stripController.setColorHS();
         }
 
         if(flags & SC_EVENT_TRANSMIT_REQ)
@@ -162,6 +169,15 @@ void StripController::levelAction(void)
     osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
+//set new fixed color from current hue and saturation values
+void StripController::setColorHS(void)
+{
+    currentColorRGB = convertHStoRGB(currentColorHS);
+    colorMode = ColorMode::FixedColor;
+    //set color action event to show the applied fixed RGB color changes
+    osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
+}
+
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
 void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 {
@@ -212,7 +228,35 @@ void StripController::setFixedColor(void)
     //set fixed color and level to all devices
     for(uint16_t dev = 0; dev < WS2812_NUMB_DEV; dev++)
     {
-        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentFixedColor, currentLevel);
+        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentColorRGB, currentLevel);
     }
+}
+
+RGB_t StripController::convertHStoRGB(HueSat_t colorHS)
+{
+    RGB_t colorRGB;
+    constexpr uint8_t NumbOfSectors = 3;    // number of sectors in the hue range
+    constexpr RGB_t RGB_nodes[NumbOfSectors + 1] =
+    {
+        {0xFF, 0, 0},
+        {0, 0xFF, 0},
+        {0, 0, 0xFF},
+        {0xFF, 0, 0}
+    };
+    constexpr uint8_t MaxHue = 254;     //max value of hue in calculations
+    constexpr uint8_t HueSectorSize = (MaxHue + 1) / NumbOfSectors;  //size of the hue sector
+
+    uint8_t hue = (colorHS.hue > MaxHue) ? MaxHue : colorHS.hue;    //hue in range <0,254>
+    uint8_t idx = hue / HueSectorSize;  // index of hue sector <0,2>
+    uint8_t hueSect = hue % HueSectorSize;  // hue value in a sector <0,HueSectorSize-1>
+    uint8_t saturationFloor = (0xFF - colorHS.saturation) >> 1;     //saturation-derived component of RGB values
+    // calculate RGB components from hue and saturation and RGB node array
+    auto R = (RGB_nodes[idx].R + (RGB_nodes[idx + 1].R - RGB_nodes[idx].R) * hueSect / HueSectorSize) * colorHS.saturation / 0xFF + saturationFloor;
+    auto G = (RGB_nodes[idx].G + (RGB_nodes[idx + 1].G - RGB_nodes[idx].G) * hueSect / HueSectorSize) * colorHS.saturation / 0xFF + saturationFloor;
+    auto B = (RGB_nodes[idx].B + (RGB_nodes[idx + 1].B - RGB_nodes[idx].B) * hueSect / HueSectorSize) * colorHS.saturation / 0xFF + saturationFloor;
+    colorRGB.R = static_cast<uint8_t>(R);
+    colorRGB.G = static_cast<uint8_t>(G);
+    colorRGB.B = static_cast<uint8_t>(B);
+    return colorRGB;
 }
 
