@@ -21,7 +21,7 @@ include:
   - {path: AppTask.h}
   - {path: CHIPProjectConfig.h}
   - {path: LightingManager.h}
-sdk: {id: simplicity_sdk, version: 2024.6.2}
+sdk: {id: simplicity_sdk, version: 2024.12.0}
 toolchain_settings:
 - {value: gnu++17, option: cxx_standard}
 component:
@@ -45,6 +45,7 @@ component:
 - {from: matter, id: matter_group_key_mgmt}
 - {from: matter, id: matter_groups}
 - {from: matter, id: matter_identify}
+- {from: matter, id: matter_leds}
 - {from: matter, id: matter_level_control}
 - {from: matter, id: matter_lighting}
 - {from: matter, id: matter_localization_configuration}
@@ -53,8 +54,9 @@ component:
 - {from: matter, id: matter_operational_credentials}
 - {from: matter, id: matter_ota_requestor}
 - {from: matter, id: matter_ota_support}
-- {from: matter, id: matter_platform_efr32}
+- {from: matter, id: matter_platform_mg}
 - {from: matter, id: matter_power_source}
+- {from: matter, id: matter_provision_default}
 - {from: matter, id: matter_segger_rtt}
 - {from: matter, id: matter_shell}
 - {from: matter, id: matter_software_diagnostics}
@@ -62,7 +64,6 @@ component:
 - {from: matter, id: matter_thread_network_diagnostics}
 - {from: matter, id: matter_time_format_localization}
 - {from: matter, id: matter_user_label}
-- {from: matter, id: matter_wstk_leds}
 - {id: MGM240PB32VNA}
 - {id: brd2704a}
 - {id: clock_manager}
@@ -114,6 +115,7 @@ ui_hints:
   highlight:
   - {path: README.md}
 sdk_extension:
-- {id: matter, version: 2.3.2}
-post_build: {path: strip_controller.slpb, profile: application}
+- {id: matter, version: 2.5.0}
+post_build:
+- {path: strip_controller.slpb, profile: application}
 

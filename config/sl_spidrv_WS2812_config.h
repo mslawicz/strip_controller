@@ -64,7 +64,7 @@
 // <o SL_SPIDRV_WS2812_CS_CONTROL> SPI master chip select (CS) control scheme.
 // <spidrvCsControlAuto=> CS controlled by the SPI driver
 // <spidrvCsControlApplication=> CS controlled by the application
-#define SL_SPIDRV_WS2812_CS_CONTROL        spidrvCsControlApplication
+#define SL_SPIDRV_WS2812_CS_CONTROL        spidrvCsControlAuto
 
 // <o SL_SPIDRV_WS2812_SLAVE_START_MODE> SPI slave transfer start scheme
 // <spidrvSlaveStartImmediate=> Transfer starts immediately
@@ -86,7 +86,7 @@
 
 // USART0 TX on PA04
 #ifndef SL_SPIDRV_WS2812_TX_PORT                
-#define SL_SPIDRV_WS2812_TX_PORT                 gpioPortA
+#define SL_SPIDRV_WS2812_TX_PORT                 SL_GPIO_PORT_A
 #endif
 #ifndef SL_SPIDRV_WS2812_TX_PIN                 
 #define SL_SPIDRV_WS2812_TX_PIN                  4
@@ -94,7 +94,7 @@
 
 // USART0 RX on PA02
 #ifndef SL_SPIDRV_WS2812_RX_PORT                
-#define SL_SPIDRV_WS2812_RX_PORT                 gpioPortA
+#define SL_SPIDRV_WS2812_RX_PORT                 SL_GPIO_PORT_A
 #endif
 #ifndef SL_SPIDRV_WS2812_RX_PIN                 
 #define SL_SPIDRV_WS2812_RX_PIN                  2
@@ -102,7 +102,7 @@
 
 // USART0 CLK on PA01
 #ifndef SL_SPIDRV_WS2812_CLK_PORT               
-#define SL_SPIDRV_WS2812_CLK_PORT                gpioPortA
+#define SL_SPIDRV_WS2812_CLK_PORT                SL_GPIO_PORT_A
 #endif
 #ifndef SL_SPIDRV_WS2812_CLK_PIN                
 #define SL_SPIDRV_WS2812_CLK_PIN                 1

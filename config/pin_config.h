@@ -88,7 +88,7 @@
 // $[USART0]
 // USART0 CLK on PA01
 #ifndef USART0_CLK_PORT                         
-#define USART0_CLK_PORT                          gpioPortA
+#define USART0_CLK_PORT                          SL_GPIO_PORT_A
 #endif
 #ifndef USART0_CLK_PIN                          
 #define USART0_CLK_PIN                           1
@@ -96,7 +96,7 @@
 
 // USART0 RX on PA02
 #ifndef USART0_RX_PORT                          
-#define USART0_RX_PORT                           gpioPortA
+#define USART0_RX_PORT                           SL_GPIO_PORT_A
 #endif
 #ifndef USART0_RX_PIN                           
 #define USART0_RX_PIN                            2
@@ -104,7 +104,7 @@
 
 // USART0 TX on PA04
 #ifndef USART0_TX_PORT                          
-#define USART0_TX_PORT                           gpioPortA
+#define USART0_TX_PORT                           SL_GPIO_PORT_A
 #endif
 #ifndef USART0_TX_PIN                           
 #define USART0_TX_PIN                            4
@@ -151,7 +151,7 @@
 // $[EUSART0]
 // EUSART0 RX on PA06
 #ifndef EUSART0_RX_PORT                         
-#define EUSART0_RX_PORT                          gpioPortA
+#define EUSART0_RX_PORT                          SL_GPIO_PORT_A
 #endif
 #ifndef EUSART0_RX_PIN                          
 #define EUSART0_RX_PIN                           6
@@ -159,7 +159,7 @@
 
 // EUSART0 TX on PA05
 #ifndef EUSART0_TX_PORT                         
-#define EUSART0_TX_PORT                          gpioPortA
+#define EUSART0_TX_PORT                          SL_GPIO_PORT_A
 #endif
 #ifndef EUSART0_TX_PIN                          
 #define EUSART0_TX_PIN                           5
@@ -170,7 +170,7 @@
 // $[PTI]
 // PTI DFRAME on PC05
 #ifndef PTI_DFRAME_PORT                         
-#define PTI_DFRAME_PORT                          gpioPortC
+#define PTI_DFRAME_PORT                          SL_GPIO_PORT_C
 #endif
 #ifndef PTI_DFRAME_PIN                          
 #define PTI_DFRAME_PIN                           5
@@ -178,7 +178,7 @@
 
 // PTI DOUT on PC04
 #ifndef PTI_DOUT_PORT                           
-#define PTI_DOUT_PORT                            gpioPortC
+#define PTI_DOUT_PORT                            SL_GPIO_PORT_C
 #endif
 #ifndef PTI_DOUT_PIN                            
 #define PTI_DOUT_PIN                             4
@@ -191,21 +191,21 @@
 
 // $[CUSTOM_PIN_NAME]
 #ifndef _PORT                                   
-#define _PORT                                    gpioPortA
+#define _PORT                                    SL_GPIO_PORT_A
 #endif
 #ifndef _PIN                                    
 #define _PIN                                     0
 #endif
 
 #ifndef test0_PORT                              
-#define test0_PORT                               gpioPortB
+#define test0_PORT                               SL_GPIO_PORT_B
 #endif
 #ifndef test0_PIN                               
 #define test0_PIN                                0
 #endif
 
 #ifndef test1_PORT                              
-#define test1_PORT                               gpioPortB
+#define test1_PORT                               SL_GPIO_PORT_B
 #endif
 #ifndef test1_PIN                               
 #define test1_PIN                                1

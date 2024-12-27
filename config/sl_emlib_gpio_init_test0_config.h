@@ -42,7 +42,7 @@
 // <gpio> SL_EMLIB_GPIO_INIT_TEST0
 // $[GPIO_SL_EMLIB_GPIO_INIT_TEST0]
 #ifndef SL_EMLIB_GPIO_INIT_TEST0_PORT           
-#define SL_EMLIB_GPIO_INIT_TEST0_PORT            gpioPortB
+#define SL_EMLIB_GPIO_INIT_TEST0_PORT            SL_GPIO_PORT_B
 #endif
 #ifndef SL_EMLIB_GPIO_INIT_TEST0_PIN            
 #define SL_EMLIB_GPIO_INIT_TEST0_PIN             0

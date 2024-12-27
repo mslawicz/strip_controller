@@ -1,0 +1,6 @@
+#CRC Codes for initially generated config files -- do not modify!
+matter/tracing/build_config.h=-1450517476
+prioconf/priority_config.prioconf=207881807
+sl_802154_radio_priority_config.h=-1018153592
+sl_bt_rtos_config_s2.h=-1287460929
+sl_openthread_radio_config.h=1443301311
