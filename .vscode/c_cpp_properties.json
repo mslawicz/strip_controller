@@ -248,7 +248,9 @@
                 "SLI_RADIOAES_REQUIRES_MASKING=1",
                 "SL_CODE_COMPONENT_PSEC_OSAL=psec_osal",
                 "SL_CODE_COMPONENT_SPIDRV=spidrv",
-                "SL_CODE_COMPONENT_UARTDRV=uartdrv"
+                "SL_CODE_COMPONENT_UARTDRV=uartdrv",
+                "CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME=\"MS controllers\"",
+                "CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME=\"ARGB controller\""
             ],
             "compileCommands": "${workspaceFolder}/strip_controller_cmake/build/compile_commands.json"
         }

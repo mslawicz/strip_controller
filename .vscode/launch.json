@@ -16,7 +16,8 @@
                 "usb = 449050609"
             ],
             "rtos": "FreeRTOS",
-            "executable": "strip_controller_cmake\\build\\default_config\\strip_controller.out"
+            "executable": "strip_controller_cmake\\build\\default_config\\strip_controller.out",
+            "serialNumber": "449050609"
         }
     ]
 }
