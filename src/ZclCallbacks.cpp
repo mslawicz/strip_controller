@@ -59,6 +59,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // Apply level attribute change to Light
         if(type == 32)
         {
+            //TODO set target level here
             stripController.setTargetLevel(*value);
             osEventFlagsSet(stripControllerFlags, SC_EVENT_LEVEL_ACTION);
         }
@@ -72,12 +73,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if(attributeId == 0x00000000)
         {
             //hue attribute
+            //TODO handle new hue here
             stripController.setHue(*value);
         }
 
         if(attributeId == 0x00000001)
         {
             //saturation attribute
+            //TODO handle saturation here
             stripController.setSaturation(*value);
             //saturation attribute always follows hue attribute - proceed with the event now
             osEventFlagsSet(stripControllerFlags, SC_EVENT_SET_HS_ACTION);
