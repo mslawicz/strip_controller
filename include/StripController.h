@@ -4,6 +4,7 @@
 #include "sl_cmsis_os2_common.h"
 
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
+#define SC_LOOP_PERIOD    40  //action period 40 ms = 25 Hz
 
 #define SC_EVENT_TRANSMIT_REQ       (1UL << 0)    //WS2812 buffer transmit request
 #define SC_EVENT_COLOR_ACTION       (1UL << 1)    //WS2812 color action request

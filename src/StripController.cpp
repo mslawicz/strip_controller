@@ -63,6 +63,14 @@ void stripControllerTaskInit(void)
 
 void stripControllerHandler(void* pvParameter)
 {
+    while(1)
+    {
+        osDelay(SC_LOOP_PERIOD);
+    }
+
+
+
+/*
     uint32_t flags;
 
     while(1)
@@ -92,6 +100,7 @@ void stripControllerHandler(void* pvParameter)
             WS2812_transmit();
         }
     }
+*/    
 }
 
 void WS2812_transmit(void)
