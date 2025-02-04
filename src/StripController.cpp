@@ -63,10 +63,19 @@ void stripControllerTaskInit(void)
 
 void stripControllerHandler(void* pvParameter)
 {
+    static uint32_t loopCounter = 0;
+    constexpr uint16_t OneSecondInterval = 1000 / SC_LOOP_PERIOD;
+
     while(1)
     {
         osDelay(SC_LOOP_PERIOD);
-        GPIO_PinOutToggle(test0_PORT, test0_PIN); //XXX test
+
+        if(loopCounter % OneSecondInterval == 0)
+        {
+            GPIO_PinOutToggle(test0_PORT, test0_PIN);
+        }
+
+        loopCounter++;
     }
 
 
