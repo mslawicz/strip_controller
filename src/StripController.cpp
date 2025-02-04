@@ -66,6 +66,7 @@ void stripControllerHandler(void* pvParameter)
     while(1)
     {
         osDelay(SC_LOOP_PERIOD);
+        GPIO_PinOutToggle(test0_PORT, test0_PIN); //XXX test
     }
 
 
