@@ -61,7 +61,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             //TODO set target level here
             stripController.setTargetLevel(*value);
-            osEventFlagsSet(stripControllerFlags, SC_EVENT_LEVEL_ACTION);
         }
     }
     else if (clusterId == ColorControl::Id)
@@ -83,7 +82,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             //TODO handle saturation here
             stripController.setSaturation(*value);
             //saturation attribute always follows hue attribute - proceed with the event now
-            osEventFlagsSet(stripControllerFlags, SC_EVENT_SET_HS_ACTION);
+            //osEventFlagsSet(stripControllerFlags, SC_EVENT_SET_HS_ACTION);
         }        
     }
     // else if (clusterId == OnOffSwitchConfiguration::Id)

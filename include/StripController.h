@@ -6,10 +6,6 @@
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define SC_LOOP_PERIOD    40  //action period 40 ms = 25 Hz
 
-#define SC_EVENT_TRANSMIT_REQ       (1UL << 0)    //WS2812 buffer transmit request
-#define SC_EVENT_COLOR_ACTION       (1UL << 1)    //WS2812 color action request
-#define SC_EVENT_LEVEL_ACTION       (1UL << 2)    //WS2812 level action request
-#define SC_EVENT_SET_HS_ACTION      (1UL << 3)    //WS2812 set color hue and saturation action request
 struct StripControllerParams_t
 {
     uint8_t* pBuffer = nullptr;     //strip components data buffer
@@ -41,7 +37,7 @@ class StripController
     void colorAction(void);
     void levelAction(void);
     void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
-    void turnOnOff(bool state) { turnedOn = state; }
+    void turnOnOff(bool state);
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
@@ -61,7 +57,6 @@ class StripController
     RGB_t convertHStoRGB(HueSat_t colorHS);
 };
 
-extern osEventFlagsId_t stripControllerFlags;
 extern StripController stripController;
 
 void stripControllerTaskInit(void);

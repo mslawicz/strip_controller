@@ -31,8 +31,6 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
 uint8_t WS2812_buffer[WS2812_BUFFER_SIZE];
 static volatile bool WS2812_busy = false;
 static volatile bool WS2812_repeat = false;
-osTimerId_t actionTimer;
-osEventFlagsId_t stripControllerFlags;
 StripControllerParams_t stripControllerParams =
 {
     .pBuffer = WS2812_buffer,
@@ -47,35 +45,18 @@ void actionTimerCbk(void *arg);
 
 void stripControllerTaskInit(void)
 {
-    stripControllerFlags = osEventFlagsNew(NULL);
-    actionTimer = osTimerNew(actionTimerCbk, osTimerOnce, nullptr, nullptr);
-
     osThreadId_t stripControllerTaskHandle = osThreadNew(stripControllerHandler, nullptr, &stripControllerTaskAttr);
     if(stripControllerTaskHandle == 0)
     {
         SILABS_LOG("strip contrller task error");
     }
-
-    //init the first action to set the WS2812 devices
-    stripController.eventRequest = SC_EVENT_COLOR_ACTION;
-    osTimerStart(actionTimer, ACTION_PERIOD);
 }
 
 void stripControllerHandler(void* pvParameter)
 {
-    static uint32_t loopCounter = 0;
-    constexpr uint16_t OneSecondInterval = 1000 / SC_LOOP_PERIOD;
-
     while(1)
     {
         osDelay(SC_LOOP_PERIOD);
-
-        if(loopCounter % OneSecondInterval == 0)
-        {
-            GPIO_PinOutToggle(test0_PORT, test0_PIN);
-        }
-
-        loopCounter++;
     }
 
 
@@ -113,6 +94,22 @@ void stripControllerHandler(void* pvParameter)
 */    
 }
 
+void StripController::turnOnOff(bool state)
+{
+    turnedOn = state;
+    SILABS_LOG("--> StripController::turnOnOff -> %s", (turnedOn) ? "On" : "Off");
+
+    //XXX test
+    if(turnedOn == true)
+    {
+        GPIO_PinOutSet(test0_PORT, test0_PIN);
+    }
+    else
+    {
+        GPIO_PinOutClear(test0_PORT, test0_PIN);
+    }
+}    
+
 void WS2812_transmit(void)
 {
     if(!WS2812_busy)
@@ -135,7 +132,7 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
         if(WS2812_repeat)
         {
             // set next transmit request
-            osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
+            //osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
             WS2812_repeat = false;
         }
     }
@@ -143,7 +140,7 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
 
 void actionTimerCbk(void *arg)
 {
-    osEventFlagsSet(stripControllerFlags, stripController.eventRequest);
+    //osEventFlagsSet(stripControllerFlags, stripController.eventRequest);
     stripController.eventRequest = 0;
 }
 
@@ -166,7 +163,7 @@ void StripController::colorAction(void)
     }
 
     //set transmit event to show the applied color changes
-    osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
+    //osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
 }
 
 void StripController::levelAction(void)
@@ -185,7 +182,7 @@ void StripController::levelAction(void)
     }
 
     //set color action event to show the applied level changes
-    osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
+    //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
 //set new fixed color from current hue and saturation values
@@ -194,7 +191,7 @@ void StripController::setColorHS(void)
     currentColorRGB = convertHStoRGB(currentColorHS);
     colorMode = ColorMode::FixedColor;
     //set color action event to show the applied fixed RGB color changes
-    osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
+    //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
