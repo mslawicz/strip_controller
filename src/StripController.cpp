@@ -205,14 +205,15 @@ void StripController::setColorHS(void)
 
 void StripController::test(void)
 {
-    RGBToPulses(WS2812_buffer, RGB_t{0xFF, 0, 0}, 48);
-    RGBToPulses(WS2812_buffer + 9, RGB_t{0x7F, 0x7F, 0}, 48);
-    RGBToPulses(WS2812_buffer + 18, RGB_t{0, 0xFF, 0}, 48);
-    RGBToPulses(WS2812_buffer + 27, RGB_t{0, 0x7F, 0x7F}, 48);
-    RGBToPulses(WS2812_buffer + 36, RGB_t{0, 0, 0xFF}, 48);
-    RGBToPulses(WS2812_buffer + 45, RGB_t{0x7F, 0, 0x7F}, 48);
-    RGBToPulses(WS2812_buffer + 54, RGB_t{0x7F, 0x7F, 0x7F}, 48);
-    RGBToPulses(WS2812_buffer + 63, RGB_t{0x7F, 0x7F, 0x7F}, 16);
+    uint8_t level = onLevel;
+    RGBToPulses(WS2812_buffer, RGB_t{0xFF, 0, 0}, level);
+    RGBToPulses(WS2812_buffer + 9, RGB_t{0x7F, 0x7F, 0}, level);
+    RGBToPulses(WS2812_buffer + 18, RGB_t{0, 0xFF, 0}, level);
+    RGBToPulses(WS2812_buffer + 27, RGB_t{0, 0x7F, 0x7F}, level);
+    RGBToPulses(WS2812_buffer + 36, RGB_t{0, 0, 0xFF}, level);
+    RGBToPulses(WS2812_buffer + 45, RGB_t{0x7F, 0, 0x7F}, level);
+    RGBToPulses(WS2812_buffer + 54, RGB_t{0x7F, 0x7F, 0x7F}, level);
+    RGBToPulses(WS2812_buffer + 63, RGB_t{0x7F, 0x7F, 0x7F}, level);
     dataTransmit();
 }
 
