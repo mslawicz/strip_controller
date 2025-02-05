@@ -59,8 +59,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // Apply level attribute change to Light
         if(type == 32)
         {
-            //TODO set target level here
-            stripController.setTargetLevel(*value);
+            //set target level
+            stripController.setOnLevel(*value);
         }
     }
     else if (clusterId == ColorControl::Id)

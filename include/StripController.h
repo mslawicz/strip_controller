@@ -36,7 +36,7 @@ class StripController
     StripController(StripControllerParams_t& params);
     void colorAction(void);
     void levelAction(void);
-    void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
+    void setOnLevel(uint8_t newOnLevel);
     void turnOnOff(bool state);
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
@@ -44,10 +44,10 @@ class StripController
 
     private:
     StripControllerParams_t& params;
+    uint8_t onLevel{1};    //current ON level set from the Matter controller
     bool turnedOn{false};       //current on/off state
     ColorMode colorMode{ColorMode::FixedColor};
     uint16_t currentLevel{4000};    //device light current level (0-255) multiplied by 100
-    uint16_t targetLevel{currentLevel};     //device light target level (0-255) multiplied by 100
     uint16_t levelTransitionSteps{0};
     RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
     HueSat_t currentColorHS{0, 0};

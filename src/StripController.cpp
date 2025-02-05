@@ -97,7 +97,7 @@ void stripControllerHandler(void* pvParameter)
 void StripController::turnOnOff(bool state)
 {
     turnedOn = state;
-    SILABS_LOG("--> StripController::turnOnOff -> %s", (turnedOn) ? "On" : "Off");
+    SILABS_LOG("StripController::turnOnOff -> %s", (turnedOn) ? "On" : "Off");
 
     //XXX test
     if(turnedOn == true)
@@ -168,21 +168,27 @@ void StripController::colorAction(void)
 
 void StripController::levelAction(void)
 {
-    if((currentLevel == targetLevel) || (levelTransitionSteps <2))
-    {
-        currentLevel = targetLevel;
-        levelTransitionSteps = 0;
-    }
-    else
-    {
-        //transitional step
-        int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
-        currentLevel += nextLevelChange;
-        levelTransitionSteps--;
-    }
+    // if((currentLevel == targetLevel) || (levelTransitionSteps <2))
+    // {
+    //     currentLevel = targetLevel;
+    //     levelTransitionSteps = 0;
+    // }
+    // else
+    // {
+    //     //transitional step
+    //     int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
+    //     currentLevel += nextLevelChange;
+    //     levelTransitionSteps--;
+    // }
 
     //set color action event to show the applied level changes
     //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
+}
+
+void StripController::setOnLevel(uint8_t newOnLevel)
+{
+    onLevel = newOnLevel;
+    SILABS_LOG("StripController::setOnLevel -> %u", onLevel);
 }
 
 //set new fixed color from current hue and saturation values
