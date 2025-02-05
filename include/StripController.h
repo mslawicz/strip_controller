@@ -41,7 +41,7 @@ class StripController
     void colorAction(void);
     void levelAction(void);
     void setTargetLevel(uint8_t newTargetLevel) { targetLevel = 100 * newTargetLevel; }
-    void turnOn(bool state) { turnedOn = state; }
+    void turnOnOff(bool state) { turnedOn = state; }
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);

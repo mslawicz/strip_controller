@@ -92,7 +92,7 @@ CHIP_ERROR AppTask::Init()
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
 
-    stripController.turnOn(LightMgr().IsLightOn());     //set initial on/off state to strip devices
+    stripController.turnOnOff(LightMgr().IsLightOn());     //set initial on/off state to strip devices
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -210,7 +210,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 
     //turn on/off the strip of LED devices
     //TODO handle turning on/off
-    stripController.turnOn(lightOn);
+    stripController.turnOnOff(lightOn);
     osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 
 #ifdef DISPLAY_ENABLED
