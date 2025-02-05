@@ -41,6 +41,7 @@ class StripController
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
+    void test(void);    //XXX test
 
     private:
     StripControllerParams_t& params;
@@ -52,9 +53,10 @@ class StripController
     RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
     HueSat_t currentColorHS{0, 0};
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
-    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level);
+    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
     void setFixedColor(void);
     RGB_t convertHStoRGB(HueSat_t colorHS);
+    void dataTransmit(void);
 };
 
 extern StripController stripController;

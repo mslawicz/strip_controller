@@ -56,6 +56,9 @@ void stripControllerHandler(void* pvParameter)
 {
     while(1)
     {
+        //XXX test
+        stripController.test();
+
         osDelay(SC_LOOP_PERIOD);
     }
 
@@ -200,16 +203,23 @@ void StripController::setColorHS(void)
     //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
+void StripController::test(void)
+{
+    RGBToPulses(WS2812_buffer, RGB_t{0xFF, 0, 0}, 48);
+    RGBToPulses(WS2812_buffer + 9, RGB_t{0x7F, 0x7F, 0}, 48);
+    RGBToPulses(WS2812_buffer + 18, RGB_t{0, 0xFF, 0}, 48);
+    RGBToPulses(WS2812_buffer + 27, RGB_t{0, 0x7F, 0x7F}, 48);
+    RGBToPulses(WS2812_buffer + 36, RGB_t{0, 0, 0xFF}, 48);
+    RGBToPulses(WS2812_buffer + 45, RGB_t{0x7F, 0, 0x7F}, 48);
+    RGBToPulses(WS2812_buffer + 54, RGB_t{0x7F, 0x7F, 0x7F}, 48);
+    RGBToPulses(WS2812_buffer + 63, RGB_t{0x7F, 0x7F, 0x7F}, 16);
+    dataTransmit();
+}
+
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
 void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 {
     uint32_t pulseBuffer = 0;
-
-    //all bits to 0 if the strip is in off state
-    if(!turnedOn)
-    {
-        colorData = 0;
-    }
 
     for(uint8_t bit = 0; bit < 8; bit++)
     {
@@ -226,16 +236,16 @@ void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 }
 
 //codes 3 bytes of RGB color value and level value into 9 bytes of WS2812 coded pulses at the address pBuffer
-void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint16_t level)
+void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level)
 {
     //function for gamma correction of level
-    static constexpr uint16_t MaxLevel = 25500; //max level 255 multiplied by 100
-    static constexpr uint16_t MaxLevel_2 = 12750; //max level 255 multiplied by 100 and halfed
-    uint16_t correctedLevel = level * level / MaxLevel;     //corrected level in range <0,25500>
+    static constexpr uint8_t MaxLevel = 255; //max level 255
+    static constexpr uint8_t MaxLevel_2 = 127; //max level 255 halfed
+    uint16_t correctedLevel = level * level / MaxLevel;     //corrected level in range <0,255>
 
-    auto gammaCorrection = [&](uint8_t colorValue, uint16_t level) -> uint8_t
+    auto gammaCorrection = [&](uint8_t colorValue, uint8_t level) -> uint8_t
     {
-        uint8_t correctedColorValue = static_cast<uint8_t>((colorValue * correctedLevel + MaxLevel_2)/ MaxLevel);
+        uint8_t correctedColorValue = static_cast<uint8_t>((colorValue * correctedLevel + MaxLevel_2) / MaxLevel);
         return ((correctedColorValue == 0) && (colorValue > 0)) ? 1 : correctedColorValue;
     };
 
@@ -282,3 +292,7 @@ RGB_t StripController::convertHStoRGB(HueSat_t colorHS)
     return colorRGB;
 }
 
+void StripController::dataTransmit(void)
+{
+    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
+}
