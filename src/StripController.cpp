@@ -40,7 +40,6 @@ StripController stripController(stripControllerParams);
 
 void stripControllerHandler(void * pvParameter);
 void WS2812_transmit(void);
-void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred);
 
 void stripControllerTaskInit(void)
 {
@@ -130,7 +129,7 @@ void WS2812_transmit(void)
     if(!WS2812_busy)
     {
         WS2812_busy = true;
-        SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
+        SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, nullptr);
     }
     else
     {
@@ -138,20 +137,6 @@ void WS2812_transmit(void)
         WS2812_repeat = true;
     }      
 }    
-
-void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred)
-{
-    if (transferStatus == ECODE_EMDRV_SPIDRV_OK)
-    {
-        WS2812_busy = false;
-        if(WS2812_repeat)
-        {
-            // set next transmit request
-            //osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
-            WS2812_repeat = false;
-        }
-    }
-}
 
 StripController::StripController(StripControllerParams_t& params) :
     params(params)
@@ -302,5 +287,5 @@ void StripController::dataTransmit(void)
         RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, bufferRGB[dev], currentLevel);
     }
 
-    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, params.pBuffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
+    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, params.pBuffer, WS2812_BUFFER_SIZE, nullptr);
 }
