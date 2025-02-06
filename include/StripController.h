@@ -32,8 +32,9 @@ enum class ColorMode : uint8_t
 class StripController
 {
     public:
-    volatile uint32_t eventRequest{0};   //event flags to be set in action timer callback
     StripController(StripControllerParams_t& params);
+    uint8_t targetLevel{0}; //target level: either onLevel or 0
+    uint8_t currentLevel{0};    //current level of the strip
     void colorAction(void);
     void levelAction(void);
     void setOnLevel(uint8_t newOnLevel);
@@ -42,13 +43,13 @@ class StripController
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
     void test(void);    //XXX test
+    void dataTransmit(void);
 
     private:
     StripControllerParams_t& params;
     uint8_t onLevel{1};    //current ON level set from the Matter controller
     bool turnedOn{false};       //current on/off state
     ColorMode colorMode{ColorMode::FixedColor};
-    uint16_t currentLevel{4000};    //device light current level (0-255) multiplied by 100
     uint16_t levelTransitionSteps{0};
     RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
     HueSat_t currentColorHS{0, 0};
@@ -56,7 +57,6 @@ class StripController
     void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
     void setFixedColor(void);
     RGB_t convertHStoRGB(HueSat_t colorHS);
-    void dataTransmit(void);
 };
 
 extern StripController stripController;

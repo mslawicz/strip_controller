@@ -209,7 +209,6 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     sLightLED.Set(lightOn);
 
     //turn on/off the strip of LED devices
-    //TODO handle turning on/off
     stripController.turnOnOff(lightOn);
 
 #ifdef DISPLAY_ENABLED

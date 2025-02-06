@@ -41,7 +41,6 @@ StripController stripController(stripControllerParams);
 void stripControllerHandler(void * pvParameter);
 void WS2812_transmit(void);
 void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int itemsTransferred);
-void actionTimerCbk(void *arg);
 
 void stripControllerTaskInit(void)
 {
@@ -54,10 +53,23 @@ void stripControllerTaskInit(void)
 
 void stripControllerHandler(void* pvParameter)
 {
+    bool transmitRequest;
+
     while(1)
     {
-        //XXX test
-        stripController.test();
+        transmitRequest = false;
+
+        if(stripController.currentLevel != stripController.targetLevel)
+        {
+            stripController.currentLevel = stripController.targetLevel;
+            transmitRequest = true;
+        }
+
+        if(transmitRequest)
+        {
+            stripController.test();
+            stripController.dataTransmit();
+        }
 
         osDelay(SC_LOOP_PERIOD);
     }
@@ -102,14 +114,15 @@ void StripController::turnOnOff(bool state)
     turnedOn = state;
     SILABS_LOG("StripController::turnOnOff -> %s", (turnedOn) ? "On" : "Off");
 
-    //XXX test
     if(turnedOn == true)
     {
         GPIO_PinOutSet(test0_PORT, test0_PIN);
+        targetLevel = onLevel;
     }
     else
     {
         GPIO_PinOutClear(test0_PORT, test0_PIN);
+        targetLevel = 0;
     }
 }    
 
@@ -139,12 +152,6 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
             WS2812_repeat = false;
         }
     }
-}
-
-void actionTimerCbk(void *arg)
-{
-    //osEventFlagsSet(stripControllerFlags, stripController.eventRequest);
-    stripController.eventRequest = 0;
 }
 
 StripController::StripController(StripControllerParams_t& params) :
@@ -192,6 +199,12 @@ void StripController::setOnLevel(uint8_t newOnLevel)
 {
     onLevel = newOnLevel;
     SILABS_LOG("StripController::setOnLevel -> %u", onLevel);
+
+    //set this level as target level if the device is switched on
+    if(turnedOn)
+    {
+        targetLevel = onLevel;
+    }
 }
 
 //set new fixed color from current hue and saturation values
@@ -205,7 +218,7 @@ void StripController::setColorHS(void)
 
 void StripController::test(void)
 {
-    uint8_t level = onLevel;
+    uint8_t level = currentLevel;
     RGBToPulses(WS2812_buffer, RGB_t{0xFF, 0, 0}, level);
     RGBToPulses(WS2812_buffer + 9, RGB_t{0x7F, 0x7F, 0}, level);
     RGBToPulses(WS2812_buffer + 18, RGB_t{0, 0xFF, 0}, level);
@@ -214,7 +227,6 @@ void StripController::test(void)
     RGBToPulses(WS2812_buffer + 45, RGB_t{0x7F, 0, 0x7F}, level);
     RGBToPulses(WS2812_buffer + 54, RGB_t{0x7F, 0x7F, 0x7F}, level);
     RGBToPulses(WS2812_buffer + 63, RGB_t{0x7F, 0x7F, 0x7F}, level);
-    dataTransmit();
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
@@ -247,7 +259,7 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
     auto gammaCorrection = [&](uint8_t colorValue, uint8_t level) -> uint8_t
     {
         uint8_t correctedColorValue = static_cast<uint8_t>((colorValue * correctedLevel + MaxLevel_2) / MaxLevel);
-        return ((correctedColorValue == 0) && (colorValue > 0)) ? 1 : correctedColorValue;
+        return ((correctedColorValue == 0) && (colorValue > 0) && (level > 0)) ? 1 : correctedColorValue;
     };
 
     //WS2812 requires G-R-B order of bytes
