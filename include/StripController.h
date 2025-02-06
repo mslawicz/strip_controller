@@ -10,6 +10,7 @@ struct StripControllerParams_t
 {
     uint8_t* pBuffer = nullptr;     //strip components data buffer
     uint16_t numberOfDevices = 0;   //number of WS2812 devices in the strip
+    uint8_t devSize = 0;            //number of pulse-coded bytes for each WS2812 device
 };
 
 struct RGB_t

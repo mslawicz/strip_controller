@@ -29,17 +29,15 @@ constexpr osThreadAttr_t stripControllerTaskAttr =
 };
 
 uint8_t WS2812_buffer[WS2812_BUFFER_SIZE];
-static volatile bool WS2812_busy = false;
-static volatile bool WS2812_repeat = false;
 StripControllerParams_t stripControllerParams =
 {
     .pBuffer = WS2812_buffer,
-    .numberOfDevices = WS2812_NUMB_DEV
+    .numberOfDevices = WS2812_NUMB_DEV,
+    .devSize = WS2812_DEV_SIZE
 };
 StripController stripController(stripControllerParams);
 
 void stripControllerHandler(void * pvParameter);
-void WS2812_transmit(void);
 
 void stripControllerTaskInit(void)
 {
@@ -122,20 +120,6 @@ void StripController::turnOnOff(bool state)
         GPIO_PinOutClear(test0_PORT, test0_PIN);
         targetLevel = 0;
     }
-}    
-
-void WS2812_transmit(void)
-{
-    if(!WS2812_busy)
-    {
-        WS2812_busy = true;
-        SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, nullptr);
-    }
-    else
-    {
-        //request transmit repetition because of possible updated data
-        WS2812_repeat = true;
-    }      
 }    
 
 StripController::StripController(StripControllerParams_t& params) :
@@ -248,7 +232,7 @@ void StripController::setFixedColor(void)
     //set fixed color and level to all devices
     for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
     {
-        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentColorRGB, currentLevel);
+        RGBToPulses(params.pBuffer + dev * params.devSize, currentColorRGB, currentLevel);
     }
 }
 
@@ -284,7 +268,7 @@ void StripController::dataTransmit(void)
 {
     for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
     {
-        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, bufferRGB[dev], currentLevel);
+        RGBToPulses(params.pBuffer + dev * params.devSize, bufferRGB[dev], currentLevel);
     }
 
     SPIDRV_MTransmit(sl_spidrv_WS2812_handle, params.pBuffer, WS2812_BUFFER_SIZE, nullptr);
