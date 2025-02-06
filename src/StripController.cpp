@@ -67,7 +67,6 @@ void stripControllerHandler(void* pvParameter)
 
         if(transmitRequest)
         {
-            stripController.test();
             stripController.dataTransmit();
         }
 
@@ -157,7 +156,11 @@ void WS2812_transferComplete(SPIDRV_Handle_t handle, Ecode_t transferStatus, int
 StripController::StripController(StripControllerParams_t& params) :
     params(params)
 {
-
+    //init RGB buffer with white color
+    for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
+    {
+        bufferRGB[dev] = {0x7F, 0x7F, 0x7F};
+    }
 }
 
 void StripController::colorAction(void)
@@ -216,19 +219,6 @@ void StripController::setColorHS(void)
     //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
-void StripController::test(void)
-{
-    uint8_t level = currentLevel;
-    RGBToPulses(WS2812_buffer, RGB_t{0xFF, 0, 0}, level);
-    RGBToPulses(WS2812_buffer + 9, RGB_t{0x7F, 0x7F, 0}, level);
-    RGBToPulses(WS2812_buffer + 18, RGB_t{0, 0xFF, 0}, level);
-    RGBToPulses(WS2812_buffer + 27, RGB_t{0, 0x7F, 0x7F}, level);
-    RGBToPulses(WS2812_buffer + 36, RGB_t{0, 0, 0xFF}, level);
-    RGBToPulses(WS2812_buffer + 45, RGB_t{0x7F, 0, 0x7F}, level);
-    RGBToPulses(WS2812_buffer + 54, RGB_t{0x7F, 0x7F, 0x7F}, level);
-    RGBToPulses(WS2812_buffer + 63, RGB_t{0x7F, 0x7F, 0x7F}, level);
-}
-
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
 void StripController::byteToPulses(uint8_t* pBuffer, uint8_t colorData)
 {
@@ -271,7 +261,7 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
 void StripController::setFixedColor(void)
 {
     //set fixed color and level to all devices
-    for(uint16_t dev = 0; dev < WS2812_NUMB_DEV; dev++)
+    for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
     {
         RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, currentColorRGB, currentLevel);
     }
@@ -307,5 +297,10 @@ RGB_t StripController::convertHStoRGB(HueSat_t colorHS)
 
 void StripController::dataTransmit(void)
 {
-    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, WS2812_buffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
+    for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
+    {
+        RGBToPulses(params.pBuffer + dev * WS2812_DEV_SIZE, bufferRGB[dev], currentLevel);
+    }
+
+    SPIDRV_MTransmit(sl_spidrv_WS2812_handle, params.pBuffer, WS2812_BUFFER_SIZE, WS2812_transferComplete);
 }

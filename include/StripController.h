@@ -42,13 +42,13 @@ class StripController
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
-    void test(void);    //XXX test
     void dataTransmit(void);
 
     private:
     StripControllerParams_t& params;
     uint8_t onLevel{1};    //current ON level set from the Matter controller
     bool turnedOn{false};       //current on/off state
+    RGB_t bufferRGB[WS2812_NUMB_DEV];   //RGB data buffer for all devices
     ColorMode colorMode{ColorMode::FixedColor};
     uint16_t levelTransitionSteps{0};
     RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
