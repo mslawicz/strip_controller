@@ -33,7 +33,9 @@ StripControllerParams_t stripControllerParams =
 {
     .pBuffer = WS2812_buffer,
     .numberOfDevices = WS2812_NUMB_DEV,
-    .devSize = WS2812_DEV_SIZE
+    .devSize = WS2812_DEV_SIZE,
+    .transitionTime = 1.0f,
+    .handlerPeriod = ACTION_PERIOD / 1000.0f
 };
 StripController stripController(stripControllerParams);
 
@@ -56,11 +58,7 @@ void stripControllerHandler(void* pvParameter)
     {
         transmitRequest = false;
 
-        if(stripController.currentLevel != stripController.targetLevel)
-        {
-            stripController.currentLevel = stripController.targetLevel;
-            transmitRequest = true;
-        }
+        transmitRequest |= stripController.levelHandler();
 
         if(transmitRequest)
         {
@@ -120,7 +118,34 @@ void StripController::turnOnOff(bool state)
         GPIO_PinOutClear(test0_PORT, test0_PIN);
         targetLevel = 0;
     }
-}    
+
+    setTransitionParameters();
+}
+
+bool StripController::levelHandler(void)
+{
+    bool transmitRequest = false;
+
+    if(currentLevel != targetLevel)
+    {
+        currentLevel_f += transitionStep;
+        if(((transitionStep > 0) && (currentLevel_f > targetLevel)) ||
+           ((transitionStep < 0) && (currentLevel_f < targetLevel)))
+        {
+            // target level reached
+            currentLevel = targetLevel;
+        }
+        else
+        {
+            // target level not reached yet - continue with the new current level
+            currentLevel = static_cast<uint8_t>(currentLevel_f);
+        }
+
+        transmitRequest = true;
+    }    
+
+    return transmitRequest;
+}
 
 StripController::StripController(StripControllerParams_t& params) :
     params(params)
@@ -176,6 +201,7 @@ void StripController::setOnLevel(uint8_t newOnLevel)
     if(turnedOn)
     {
         targetLevel = onLevel;
+        setTransitionParameters();
     }
 }
 
@@ -225,6 +251,12 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
     byteToPulses(pBuffer, gammaCorrection(RGB_data.G, level));
     byteToPulses(pBuffer + 3, gammaCorrection(RGB_data.R, level));
     byteToPulses(pBuffer + 6, gammaCorrection(RGB_data.B, level));
+}
+
+void StripController::setTransitionParameters(void)
+{
+    currentLevel_f = static_cast<float>(currentLevel);
+    transitionStep = (static_cast<float>(targetLevel) - currentLevel_f) * params.handlerPeriod / params.transitionTime;
 }
 
 void StripController::setFixedColor(void)

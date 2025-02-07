@@ -11,6 +11,8 @@ struct StripControllerParams_t
     uint8_t* pBuffer = nullptr;     //strip components data buffer
     uint16_t numberOfDevices = 0;   //number of WS2812 devices in the strip
     uint8_t devSize = 0;            //number of pulse-coded bytes for each WS2812 device
+    float transitionTime = 0.0;     //transition time in seconds
+    float handlerPeriod = 0.0;      //handler period in seconds
 };
 
 struct RGB_t
@@ -34,28 +36,34 @@ class StripController
 {
     public:
     StripController(StripControllerParams_t& params);
-    uint8_t targetLevel{0}; //target level: either onLevel or 0
-    uint8_t currentLevel{0};    //current level of the strip
-    void colorAction(void);
-    void levelAction(void);
     void setOnLevel(uint8_t newOnLevel);
     void turnOnOff(bool state);
+    bool levelHandler(void);
+    
+    void colorAction(void);
+    void levelAction(void);
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
     void dataTransmit(void);
-
+    
     private:
     StripControllerParams_t& params;
+    uint8_t targetLevel{0}; //target level: either onLevel or 0
+    uint8_t currentLevel{0};    //current level of the strip
     uint8_t onLevel{1};    //current ON level set from the Matter controller
     bool turnedOn{false};       //current on/off state
     RGB_t bufferRGB[WS2812_NUMB_DEV];   //RGB data buffer for all devices
+    float currentLevel_f{0};    //current level in float format for transitional steps
+    float transitionStep{0};    //level transition step for gradual current level change
+    void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
+    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
+    void setTransitionParameters(void);
+
     ColorMode colorMode{ColorMode::FixedColor};
     uint16_t levelTransitionSteps{0};
     RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
     HueSat_t currentColorHS{0, 0};
-    void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
-    void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
     void setFixedColor(void);
     RGB_t convertHStoRGB(HueSat_t colorHS);
 };
