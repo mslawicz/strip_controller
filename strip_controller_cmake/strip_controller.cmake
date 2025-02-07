@@ -1,6 +1,7 @@
-set(SDK_PATH "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2")
+include(user_path.cmake)
+set(SDK_PATH "${USER_PATH}SimplicityStudio/SDKs/simplicity_sdk_2")
 set(COPIED_SDK_PATH "simplicity_sdk_2024.12.0")
-set(PKG_PATH "C:/Users/marci/.silabs/slt/installs")
+set(PKG_PATH "${USER_PATH}.silabs/slt/installs")
 
 add_library(slc_strip_controller OBJECT
     "${SDK_PATH}/extension/matter_extension/slc/component/sdk-content/simplicity-sdk/util/third_party/segger/systemview/SEGGER/SEGGER_RTT.c"

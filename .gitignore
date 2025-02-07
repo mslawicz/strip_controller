@@ -1,6 +1,5 @@
 build
 artifact
 /.vscode/settings.json
-/strip_controller_cmake/strip_controller.cmake
 /.projectlinkstore
-/strip_controller_cmake/user.cmake
+strip_controller_cmake/user_path.cmake
