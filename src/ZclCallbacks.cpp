@@ -62,13 +62,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             //set current ON level
             stripController.setLevel(*value);
         }
-
-        // OnOffTransitionTime attribute
-        if(attributeId == 0x00000010)
-        {
-            //set transition time
-            stripController.setTransitionTime(*value);
-        }
     }
     else if (clusterId == ColorControl::Id)
     {

@@ -34,7 +34,6 @@ StripControllerParams_t stripControllerParams =
     .pBuffer = WS2812_buffer,
     .numberOfDevices = WS2812_NUMB_DEV,
     .devSize = WS2812_DEV_SIZE,
-    .transitionTime = 1.0f,
     .handlerPeriod = ACTION_PERIOD / 1000.0f
 };
 StripController stripController(stripControllerParams);
@@ -111,11 +110,6 @@ void StripController::turnOnOff(bool state)
     {
         GPIO_PinOutClear(test0_PORT, test0_PIN);
     }
-}
-
-void StripController::setTransitionTime(uint16_t transitionTime)
-{
-    params.transitionTime = transitionTime / 10.0f;
 }
 
 StripController::StripController(StripControllerParams_t& params) :
