@@ -46,6 +46,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
+        //cluster OnOff, attribute OnOff
 #ifdef DIC_ENABLE
         dic_sendmsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // DIC_ENABLE
@@ -53,6 +54,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == LevelControl::Id)
     {
+        // cluster LevelControl
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
@@ -65,6 +67,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == ColorControl::Id)
     {
+        // cluster color control
         ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
@@ -72,17 +75,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if(attributeId == 0x00000000)
         {
             //hue attribute
-            //TODO handle new hue here
             stripController.setHue(*value);
         }
 
         if(attributeId == 0x00000001)
         {
             //saturation attribute
-            //TODO handle saturation here
             stripController.setSaturation(*value);
-            //saturation attribute always follows hue attribute - proceed with the event now
-            //osEventFlagsSet(stripControllerFlags, SC_EVENT_SET_HS_ACTION);
         }        
     }
     // else if (clusterId == OnOffSwitchConfiguration::Id)

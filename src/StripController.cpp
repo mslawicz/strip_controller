@@ -60,41 +60,7 @@ void stripControllerHandler(void* pvParameter)
         }
 
         osDelay(SC_LOOP_PERIOD);
-    }
-
-
-
-/*
-    uint32_t flags;
-
-    while(1)
-    {
-        flags = osEventFlagsWait(stripControllerFlags, SC_EVENT_WAIT_FLAGS, osFlagsWaitAny, osWaitForever);
-
-        if(flags & SC_EVENT_LEVEL_ACTION)
-        {
-            stripController.levelAction();
-        }
-
-        if(flags & SC_EVENT_COLOR_ACTION)
-        {
-            // device color handling action request
-            stripController.colorAction();
-        }
-
-        if(flags & SC_EVENT_SET_HS_ACTION)
-        {
-            // set new fixed color from hue and saturation
-            stripController.setColorHS();
-        }
-
-        if(flags & SC_EVENT_TRANSMIT_REQ)
-        {
-            // WS2812 data transmit request
-            WS2812_transmit();
-        }
-    }
-*/    
+    }  
 }
 
 void StripController::turnOnOff(bool state)
@@ -124,35 +90,10 @@ StripController::StripController(StripControllerParams_t& params) :
     }
 }
 
-void StripController::colorAction(void)
-{
-    switch(colorMode)
-    {
-        case ColorMode::FixedColor:
-        setFixedColor();
-        break;
-
-        default:
-        break;
-    }
-
-    //set transmit event to show the applied color changes
-    //osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
-}
-
 void StripController::setLevel(uint8_t newLevel)
 {
     currentLevel = turnedOn ? newLevel : 0;
     transmitRequest = true;
-}
-
-//set new fixed color from current hue and saturation values
-void StripController::setColorHS(void)
-{
-    currentColorRGB = convertHStoRGB(currentColorHS);
-    colorMode = ColorMode::FixedColor;
-    //set color action event to show the applied fixed RGB color changes
-    //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
 }
 
 //codes one byte of color value into 3 bytes of WS2812 coded pulses at the address pBuffer
@@ -197,10 +138,13 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
 void StripController::setFixedColor(void)
 {
     //set fixed color and level to all devices
-    for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
+    colorMode = ColorMode::FixedColor;
+    currentColorRGB = convertHStoRGB(currentColorHS);
+    for(auto& dev:bufferRGB)
     {
-        RGBToPulses(params.pBuffer + dev * params.devSize, currentColorRGB, currentLevel);
+        dev = currentColorRGB;
     }
+    transmitRequest = true;
 }
 
 RGB_t StripController::convertHStoRGB(HueSat_t colorHS)
@@ -239,4 +183,16 @@ void StripController::dataTransmit(void)
     }
 
     SPIDRV_MTransmit(sl_spidrv_WS2812_handle, params.pBuffer, WS2812_BUFFER_SIZE, nullptr);
+}
+
+void StripController::setHue(uint8_t hue)
+{
+    currentColorHS.hue = hue;
+    setFixedColor();
+}
+
+void StripController::setSaturation(uint8_t saturation)
+{
+    currentColorHS.saturation = saturation;
+    setFixedColor();
 }

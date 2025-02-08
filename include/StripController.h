@@ -39,11 +39,8 @@ class StripController
     void setLevel(uint8_t newLevel);
     void turnOnOff(bool state);
     void dataTransmit(void);
-    
-    void colorAction(void);
-    void setHue(uint8_t hue) { currentColorHS.hue = hue; }
-    void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
-    void setColorHS(void);
+    void setHue(uint8_t hue);
+    void setSaturation(uint8_t saturation);
     
     private:
     StripControllerParams_t& params;
@@ -52,12 +49,12 @@ class StripController
     RGB_t bufferRGB[WS2812_NUMB_DEV];   //RGB data buffer for all devices
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
     void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
-
     ColorMode colorMode{ColorMode::FixedColor};
-    RGB_t currentColorRGB{0xFF, 0xFF, 0xFF};
+    RGB_t currentColorRGB{0x7F, 0x7F, 0x7F};
     HueSat_t currentColorHS{0, 0};
     void setFixedColor(void);
     RGB_t convertHStoRGB(HueSat_t colorHS);
+
 };
 
 extern StripController stripController;
