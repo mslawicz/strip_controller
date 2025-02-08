@@ -109,6 +109,8 @@ void StripController::turnOnOff(bool state)
     else
     {
         GPIO_PinOutClear(test0_PORT, test0_PIN);
+        currentLevel = 0;
+        transmitRequest = true;
     }
 }
 
