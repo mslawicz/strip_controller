@@ -39,6 +39,7 @@ class StripController
     void setOnLevel(uint8_t newOnLevel);
     void turnOnOff(bool state);
     bool levelHandler(void);
+    void setTransitionTime(uint16_t transitionTime);
     
     void colorAction(void);
     void levelAction(void);

@@ -56,11 +56,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        // Apply level attribute change to Light
-        if(type == 32)
+        // CurrentLevel attribute
+        if(attributeId == 0)
         {
-            //set target level
+            //set current ON level
             stripController.setOnLevel(*value);
+        }
+
+        // OnOffTransitionTime attribute
+        if(attributeId == 0x00000010)
+        {
+            //set transition time
+            stripController.setTransitionTime(*value);
         }
     }
     else if (clusterId == ColorControl::Id)

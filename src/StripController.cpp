@@ -147,6 +147,11 @@ bool StripController::levelHandler(void)
     return transmitRequest;
 }
 
+void StripController::setTransitionTime(uint16_t transitionTime)
+{
+    params.transitionTime = transitionTime / 10.0f;
+}
+
 StripController::StripController(StripControllerParams_t& params) :
     params(params)
 {
@@ -256,7 +261,7 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
 void StripController::setTransitionParameters(void)
 {
     currentLevel_f = static_cast<float>(currentLevel);
-    transitionStep = (static_cast<float>(targetLevel) - currentLevel_f) * params.handlerPeriod / params.transitionTime;
+    transitionStep = (params.transitionTime == 0.0f) ? 256.0f : (static_cast<float>(targetLevel) - currentLevel_f) * params.handlerPeriod / params.transitionTime;
 }
 
 void StripController::setFixedColor(void)
