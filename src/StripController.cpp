@@ -199,5 +199,13 @@ void StripController::setSaturation(uint8_t saturation)
 
 void StripController::setColorTemperature(uint16_t colorTemperature)
 {
-    SILABS_LOG("###### Mireds %u", colorTemperature);
+    float sat = 0.666105f * static_cast<float>(colorTemperature) - 85.42327f;
+    currentColorHS.hue = sat < 0 ? 147 : 20;    //hue 147 for cold white, hue 20 for warm white
+    sat = fabs(sat);
+    if(sat > 255.0f)
+    {
+        sat = 255.0f;
+    }
+    currentColorHS.saturation = static_cast<uint8_t>(sat);
+    setFixedColor();
 }

@@ -87,7 +87,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if(attributeId == 0x00000007)
         {
             //color temperature Mireds attribute
-            stripController.setColorTemperature(*value);
+            stripController.setColorTemperature(*reinterpret_cast<uint16_t*>(value));
         }
     }
     // else if (clusterId == OnOffSwitchConfiguration::Id)
