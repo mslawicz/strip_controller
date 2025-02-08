@@ -41,6 +41,7 @@ class StripController
     void dataTransmit(void);
     void setHue(uint8_t hue);
     void setSaturation(uint8_t saturation);
+    void setColorTemperature(uint16_t colorTemperature);
     
     private:
     StripControllerParams_t& params;

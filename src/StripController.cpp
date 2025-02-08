@@ -196,3 +196,8 @@ void StripController::setSaturation(uint8_t saturation)
     currentColorHS.saturation = saturation;
     setFixedColor();
 }
+
+void StripController::setColorTemperature(uint16_t colorTemperature)
+{
+    SILABS_LOG("###### Mireds %u", colorTemperature);
+}

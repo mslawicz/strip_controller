@@ -82,7 +82,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             //saturation attribute
             stripController.setSaturation(*value);
-        }        
+        }   
+        
+        if(attributeId == 0x00000007)
+        {
+            //color temperature Mireds attribute
+            stripController.setColorTemperature(*value);
+        }
     }
     // else if (clusterId == OnOffSwitchConfiguration::Id)
     // {
