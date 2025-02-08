@@ -52,17 +52,12 @@ void stripControllerTaskInit(void)
 
 void stripControllerHandler(void* pvParameter)
 {
-    bool transmitRequest;
-
     while(1)
     {
-        transmitRequest = false;
-
-        transmitRequest |= stripController.levelHandler();
-
-        if(transmitRequest)
+        if(stripController.transmitRequest)
         {
             stripController.dataTransmit();
+            stripController.transmitRequest = false;
         }
 
         osDelay(SC_LOOP_PERIOD);
@@ -111,40 +106,11 @@ void StripController::turnOnOff(bool state)
     if(turnedOn == true)
     {
         GPIO_PinOutSet(test0_PORT, test0_PIN);
-        targetLevel = onLevel;
     }
     else
     {
         GPIO_PinOutClear(test0_PORT, test0_PIN);
-        targetLevel = 0;
     }
-
-    setTransitionParameters();
-}
-
-bool StripController::levelHandler(void)
-{
-    bool transmitRequest = false;
-
-    if(currentLevel != targetLevel)
-    {
-        currentLevel_f += transitionStep;
-        if(((transitionStep > 0) && (currentLevel_f > targetLevel)) ||
-           ((transitionStep < 0) && (currentLevel_f < targetLevel)))
-        {
-            // target level reached
-            currentLevel = targetLevel;
-        }
-        else
-        {
-            // target level not reached yet - continue with the new current level
-            currentLevel = static_cast<uint8_t>(currentLevel_f);
-        }
-
-        transmitRequest = true;
-    }    
-
-    return transmitRequest;
 }
 
 void StripController::setTransitionTime(uint16_t transitionTime)
@@ -178,36 +144,10 @@ void StripController::colorAction(void)
     //osEventFlagsSet(stripControllerFlags, SC_EVENT_TRANSMIT_REQ);
 }
 
-void StripController::levelAction(void)
+void StripController::setLevel(uint8_t newLevel)
 {
-    // if((currentLevel == targetLevel) || (levelTransitionSteps <2))
-    // {
-    //     currentLevel = targetLevel;
-    //     levelTransitionSteps = 0;
-    // }
-    // else
-    // {
-    //     //transitional step
-    //     int16_t nextLevelChange = (targetLevel - currentLevel) / levelTransitionSteps;
-    //     currentLevel += nextLevelChange;
-    //     levelTransitionSteps--;
-    // }
-
-    //set color action event to show the applied level changes
-    //osEventFlagsSet(stripControllerFlags, SC_EVENT_COLOR_ACTION);
-}
-
-void StripController::setOnLevel(uint8_t newOnLevel)
-{
-    onLevel = newOnLevel;
-    SILABS_LOG("StripController::setOnLevel -> %u", onLevel);
-
-    //set this level as target level if the device is switched on
-    if(turnedOn)
-    {
-        targetLevel = onLevel;
-        setTransitionParameters();
-    }
+    currentLevel = turnedOn ? newLevel : 0;
+    transmitRequest = true;
 }
 
 //set new fixed color from current hue and saturation values
@@ -256,12 +196,6 @@ void StripController::RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t leve
     byteToPulses(pBuffer, gammaCorrection(RGB_data.G, level));
     byteToPulses(pBuffer + 3, gammaCorrection(RGB_data.R, level));
     byteToPulses(pBuffer + 6, gammaCorrection(RGB_data.B, level));
-}
-
-void StripController::setTransitionParameters(void)
-{
-    currentLevel_f = static_cast<float>(currentLevel);
-    transitionStep = (params.transitionTime == 0.0f) ? 256.0f : (static_cast<float>(targetLevel) - currentLevel_f) * params.handlerPeriod / params.transitionTime;
 }
 
 void StripController::setFixedColor(void)

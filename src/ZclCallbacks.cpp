@@ -60,7 +60,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if(attributeId == 0)
         {
             //set current ON level
-            stripController.setOnLevel(*value);
+            stripController.setLevel(*value);
         }
 
         // OnOffTransitionTime attribute

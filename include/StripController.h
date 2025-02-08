@@ -36,13 +36,12 @@ class StripController
 {
     public:
     StripController(StripControllerParams_t& params);
-    void setOnLevel(uint8_t newOnLevel);
+    bool transmitRequest{false};
+    void setLevel(uint8_t newLevel);
     void turnOnOff(bool state);
-    bool levelHandler(void);
     void setTransitionTime(uint16_t transitionTime);
     
     void colorAction(void);
-    void levelAction(void);
     void setHue(uint8_t hue) { currentColorHS.hue = hue; }
     void setSaturation(uint8_t saturation) { currentColorHS.saturation = saturation; }
     void setColorHS(void);
@@ -50,16 +49,13 @@ class StripController
     
     private:
     StripControllerParams_t& params;
-    uint8_t targetLevel{0}; //target level: either onLevel or 0
     uint8_t currentLevel{0};    //current level of the strip
-    uint8_t onLevel{1};    //current ON level set from the Matter controller
     bool turnedOn{false};       //current on/off state
     RGB_t bufferRGB[WS2812_NUMB_DEV];   //RGB data buffer for all devices
     float currentLevel_f{0};    //current level in float format for transitional steps
     float transitionStep{0};    //level transition step for gradual current level change
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);
     void RGBToPulses(uint8_t* pBuffer, RGB_t RGB_data, uint8_t level);
-    void setTransitionParameters(void);
 
     ColorMode colorMode{ColorMode::FixedColor};
     uint16_t levelTransitionSteps{0};
