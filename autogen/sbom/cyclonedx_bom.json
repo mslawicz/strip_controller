@@ -3,7 +3,7 @@
   "specVersion" : "1.6",
   "version" : 1,
   "metadata" : {
-    "timestamp" : "2025-02-11T17:16:31.503900100Z",
+    "timestamp" : "2025-02-15T14:26:19.537389Z",
     "authors" : [ {
       "name" : "Silicon Laboratories, Inc."
     } ],
@@ -1034,6 +1034,18 @@
       "type" : "library",
       "bom-ref" : "matter:2.5.0:dnssd",
       "name" : "dnssd",
+      "version" : "2.5.0",
+      "supplier" : {
+        "name" : "Silicon Laboratories Inc."
+      },
+      "licenses" : [ {
+        "expression" : "Apache 2.0"
+      } ]
+    }, {
+      "scope" : "required",
+      "type" : "library",
+      "bom-ref" : "matter:2.5.0:matter_scenes",
+      "name" : "Scenes Management Server Cluster",
       "version" : "2.5.0",
       "supplier" : {
         "name" : "Silicon Laboratories Inc."

@@ -94,6 +94,7 @@
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/app/clusters/ota-requestor",
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/app/clusters/power-source-server",
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/platform/silabs/provision",
+                "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/app/clusters/scenes-server",
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/slc/component/sdk-content/simplicity-sdk/util/third_party/segger/systemview/SEGGER",
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/lib/shell",
                 "C:/Users/marci/SimplicityStudio/SDKs/simplicity_sdk_2/extension/matter_extension/third_party/matter_sdk/src/lib/shell/commands",

@@ -13,7 +13,7 @@ DocumentNamespace: https://silabs.com
 
 ## Creation Information
 Creator: Organization: Silicon Laboratories, Inc.
-Created: 2025-02-11T17:16:31.503900100Z
+Created: 2025-02-15T14:26:19.537389Z
 ## Relationships
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-matter-2.5.0
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-simplicity_sdk-2024.12.0
@@ -111,6 +111,7 @@ Relationship: SPDXRef-matter-2.5.0 CONTAINS SPDXRef-matter-2.5.0-matter_nlassert
 Relationship: SPDXRef-matter-2.5.0 CONTAINS SPDXRef-matter-2.5.0-address_resolve
 Relationship: SPDXRef-matter-2.5.0 CONTAINS SPDXRef-matter-2.5.0-text_only_logging
 Relationship: SPDXRef-matter-2.5.0 CONTAINS SPDXRef-matter-2.5.0-dnssd
+Relationship: SPDXRef-matter-2.5.0 CONTAINS SPDXRef-matter-2.5.0-matter_scenes
 
 ## Package Information
 PackageName: app_common
@@ -1046,6 +1047,17 @@ PackageSupplier: Organization: Silicon Laboratories Inc.
 PackageLicenseConcluded: Apache 2.0
 ## Relationships
 Relationship: SPDXRef-matter-2.5.0-dnssd CONTAINED_BY SPDXRef-matter-2.5.0
+
+## Package Information
+PackageName: Scenes Management Server Cluster
+SPDXID: SPDXRef-matter-2.5.0-matter_scenes
+PackageVersion: 2.5.0
+PrimaryPackagePurpose: LIBRARY
+PackageDownloadLocation: NOASSERTION
+PackageSupplier: Organization: Silicon Laboratories Inc.
+PackageLicenseConcluded: Apache 2.0
+## Relationships
+Relationship: SPDXRef-matter-2.5.0-matter_scenes CONTAINED_BY SPDXRef-matter-2.5.0
 
 ## Package Information
 PackageName: Simplicity SDK Suite

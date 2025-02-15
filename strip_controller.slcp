@@ -57,6 +57,7 @@ component:
 - {from: matter, id: matter_platform_mg}
 - {from: matter, id: matter_power_source}
 - {from: matter, id: matter_provision_default}
+- {from: matter, id: matter_scenes}
 - {from: matter, id: matter_segger_rtt}
 - {from: matter, id: matter_shell}
 - {from: matter, id: matter_software_diagnostics}

@@ -5,7 +5,7 @@
   "name" : "Silicon-Laboratories",
   "documentNamespace" : "https://silabs.com",
   "creationInfo" : {
-    "created" : "2025-02-11T17:16:31.503900100Z",
+    "created" : "2025-02-15T14:26:19.537389Z",
     "creators" : [ "Tool: Silicon Labs Configuration Tooling" ]
   },
   "comment" : "TERMS OF USE - SILICON LABORATORIES INC.\n(With respect to Silicon Labs software components, this Software Bill of Materials (SBOM) is based upon Silicon Labs'\nreview and analysis of the code version when released.  It is provided \"AS IS\" and does not modify, change or alter\nthe terms or conditions of your use of Silicon Labs' software and/or SDKs based upon license terms and/or agreements\nassociated with this software or SDKs when distributed to you, received by you, or installed by you.  Further, no\nwarranties or obligations are created by this SBOM.  It is your obligation to comply with the terms of licenses\nreferenced in this SBOM.)",
@@ -692,6 +692,14 @@
   }, {
     "SPDXID" : "SPDXRef-matter-2.5.0-dnssd",
     "name" : "dnssd",
+    "versionInfo" : "2.5.0",
+    "primaryPackagePurpose" : "LIBRARY",
+    "downloadLocation" : "NOASSERTION",
+    "supplier" : "Organization: Silicon Laboratories Inc.",
+    "licenseConcluded" : "Apache 2.0"
+  }, {
+    "SPDXID" : "SPDXRef-matter-2.5.0-matter_scenes",
+    "name" : "Scenes Management Server Cluster",
     "versionInfo" : "2.5.0",
     "primaryPackagePurpose" : "LIBRARY",
     "downloadLocation" : "NOASSERTION",
@@ -3454,6 +3462,10 @@
   }, {
     "spdxElementId" : "SPDXRef-matter-2.5.0",
     "relatedSpdxElement" : "SPDXRef-matter-2.5.0-dnssd",
+    "relationshipType" : "CONTAINS"
+  }, {
+    "spdxElementId" : "SPDXRef-matter-2.5.0",
+    "relatedSpdxElement" : "SPDXRef-matter-2.5.0-matter_scenes",
     "relationshipType" : "CONTAINS"
   }, {
     "spdxElementId" : "SPDXRef-simplicity_sdk-2024.12.0",
