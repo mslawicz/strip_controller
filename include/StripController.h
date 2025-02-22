@@ -5,6 +5,7 @@
 
 #define WS2812_NUMB_DEV     8   //number of WS2812 devices in the strip
 #define SC_LOOP_PERIOD    40  //action period 40 ms = 25 Hz
+#define WS2812_START_LEVEL 100    //level when the strip is turned on
 
 struct StripControllerParams_t
 {
@@ -42,10 +43,12 @@ class StripController
     void setHue(uint8_t hue);
     void setSaturation(uint8_t saturation);
     void setColorTemperature(uint16_t colorTemperature);
+    void verifyLevel(void);
     
     private:
     StripControllerParams_t& params;
     uint8_t currentLevel{0};    //current level of the strip
+    uint8_t onLevel{WS2812_START_LEVEL};      //level when the strip is turned on
     bool turnedOn{false};       //current on/off state
     RGB_t bufferRGB[WS2812_NUMB_DEV];   //RGB data buffer for all devices
     void byteToPulses(uint8_t* pBuffer, uint8_t colorData);

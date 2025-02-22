@@ -9,6 +9,7 @@
 #define WS2812_DEV_SIZE     9   //number of pulse-coded bytes for each WS2812 device
 #define WS2812_BUFFER_SIZE  (WS2812_DEV_SIZE * WS2812_NUMB_DEV)   //number of pulse-coded bytes for all WS2812 devices
 #define ACTION_PERIOD   40  //action period 40 ms = 25 Hz
+#define RGB_WHITE       {0x7F, 0x7F, 0x7F}
 
 #define SC_EVENT_WAIT_FLAGS (SC_EVENT_TRANSMIT_REQ | \
                              SC_EVENT_COLOR_ACTION | \
@@ -53,6 +54,8 @@ void stripControllerHandler(void* pvParameter)
 {
     while(1)
     {
+        stripController.verifyLevel();
+
         if(stripController.transmitRequest)
         {
             stripController.dataTransmit();
@@ -86,13 +89,17 @@ StripController::StripController(StripControllerParams_t& params) :
     //init RGB buffer with white color
     for(uint16_t dev = 0; dev < params.numberOfDevices; dev++)
     {
-        bufferRGB[dev] = {0x7F, 0x7F, 0x7F};
+        bufferRGB[dev] = RGB_WHITE;
     }
 }
 
 void StripController::setLevel(uint8_t newLevel)
 {
-    currentLevel = turnedOn ? newLevel : 0;
+    if(newLevel > 0)
+    {
+        onLevel = newLevel;
+    }
+    currentLevel = turnedOn ? onLevel : 0;
     transmitRequest = true;
 }
 
@@ -208,4 +215,13 @@ void StripController::setColorTemperature(uint16_t colorTemperature)
     }
     currentColorHS.saturation = static_cast<uint8_t>(sat);
     setFixedColor();
+}
+
+void StripController::verifyLevel(void)
+{
+    if(turnedOn && (currentLevel != onLevel))
+    {
+        currentLevel = onLevel;
+        transmitRequest = true;
+    }
 }
